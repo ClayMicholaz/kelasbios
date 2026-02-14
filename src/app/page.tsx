@@ -1,65 +1,228 @@
-import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import ClassCard from "@/components/ClassCard";
+import EmptyState from "@/components/EmptyState";
+import Link from "next/link";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const supabase = await createClient();
+
+  // Get all open classes with enrollment count
+  const { data: classes, error } = await supabase
+    .from("classes")
+    .select(
+      `
+      *,
+      enrollments!inner(payment_status)
+    `,
+    )
+    .eq("status", "open")
+    .order("class_date", { ascending: true });
+
+  // Calculate enrollment count for each class
+  const classesWithCount =
+    classes?.map((classItem) => {
+      const enrollmentCount =
+        classItem.enrollments?.filter(
+          (e: any) => e.payment_status === "verified",
+        ).length || 0;
+
+      return {
+        ...classItem,
+        enrollment_count: enrollmentCount,
+      };
+    }) || [];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-linear-to-br from-primary-50 via-white to-accent-50">
+      {/* Hero Section */}
+      <section className="relative bg-linear-to-br from-primary-800 via-primary-700 to-primary-900 text-white py-24 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
+              Selamat Datang di BIOS LMS
+            </h1>
+            <p className="text-xl md:text-2xl mb-6 text-accent-100">
+              Platform Pembelajaran Eksklusif untuk Mahasiswa Teknik Informatika
+              UBM
+            </p>
+            <p className="text-lg mb-10 max-w-2xl mx-auto text-primary-100">
+              Tingkatkan keterampilan Anda dengan bergabung di kelas-kelas
+              eksklusif BIOS. Hanya Rp 10.000 per sesi untuk pembelajaran
+              intensif selama 2 jam!
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Link
+                href="/auth/login"
+                className="px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 hover:scale-105 transition-all font-semibold text-lg shadow-xl"
+              >
+                Masuk dengan Google UBM
+              </Link>
+              <Link
+                href="#classes"
+                className="px-8 py-4 bg-transparent text-white rounded-lg hover:bg-white/10 transition-all font-semibold text-lg border-2 border-accent-300 shadow-xl"
+              >
+                Lihat Kelas
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-linear-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
+            Mengapa Memilih BIOS LMS?
+          </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Platform pembelajaran terbaik untuk mahasiswa Teknik Informatika UBM
           </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow">
+              <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-primary-700"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Materi Berkualitas</h3>
+              <p className="text-gray-600">
+                Kurikulum yang dirancang khusus dengan materi terkini dan
+                relevan
+              </p>
+            </div>
+
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-primary-700"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Harga Terjangkau</h3>
+              <p className="text-gray-600">
+                Hanya Rp 10.000 untuk sesi pembelajaran 2 jam yang intensif
+              </p>
+            </div>
+
+            <div className="text-center p-6">
+              <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  className="w-8 h-8 text-primary-700"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Kelas Eksklusif</h3>
+              <p className="text-gray-600">
+                Jumlah peserta terbatas untuk pengalaman belajar yang optimal
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </section>
+
+      {/* Classes Section */}
+      <section id="classes" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Kelas yang Tersedia
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Pilih kelas yang sesuai dengan minat dan kebutuhan Anda. Daftar
+              sekarang sebelum tempat habis!
+            </p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-6">
+              Terjadi kesalahan saat memuat data kelas
+            </div>
+          )}
+
+          {classesWithCount.length === 0 ? (
+            <EmptyState
+              title="Belum Ada Kelas Tersedia"
+              description="Saat ini belum ada kelas yang dibuka. Silakan cek kembali nanti."
+              icon={
+                <svg
+                  className="w-16 h-16"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              }
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {classesWithCount.map((classItem) => (
+                <ClassCard key={classItem.id} classData={classItem} />
+              ))}
+            </div>
+          )}
         </div>
-      </main>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-primary-700 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            Siap Meningkatkan Keterampilan Anda?
+          </h2>
+          <p className="text-xl mb-8 text-accent-100">
+            Bergabunglah dengan ribuan mahasiswa yang telah mengambil kelas di
+            BIOS LMS
+          </p>
+          <Link
+            href="/auth/login"
+            className="inline-block px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-lg shadow-lg"
+          >
+            Masuk Sekarang
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,36 +1,12 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Requirement website kelasbios.vercel.app:
+Website ini dengan Learning Management System, dimana organisasi kampus bernama BIOS akan membuka kelas berbayar sebesar Rp10.000 untuk 1 sesi / 2jam kelas. dimana ketika kelas dibuka akan menampilkan nama topik, durasi kelas, dan apa saja yang dipelajari, serta materinya.
 
-## Getting Started
+jadi saya ingin kamu membuatkan halaman Home yang menampilkan kelas yang lagi dibuka, login dan daftar dengan domain akun ubm @student.ubm.ac.id, lalu juga ada Member Dashboard (jika sudah membayar 10.000 dan diverifikasi admin), lalu di dashboard member akan menampilkan kelas yang diikuti (sudah dibayar).
 
-First, run the development server:
+lalu juga ada admin yang dapat membuka/membuat kelas baru, mengisi nama kelas, deskripsi kelas, isi materi berupa pdf, ruangan kelas yang akan digunakan, jumlah peserta, lalu bisa juga memasukkan soal latihan dengan json, lalu bisa juga untuk manajemen member yang baru mendaftar (membayar) untuk kelas.
+di kelas yang dibuka juga bisa diatur tanggal dan jamnya, lalu ada juga tanggal dan jamnya untuk sebelum tutup pendaftaran kelas tersebut. <- Mirip marketplace. lalu juga dapat menampilkan sisa hari, sisa Seat/tempat/Peserta duduk yang tersisa.
+pendaftar kelas dapat melakukan pembayaran ke rekening 100271468145
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+lalu buatkan juga halaman untuk error seperti 404, dan 403. lalu pastikan setiap pembayaran tidak overlapping jadi tidak akan terjadi overseat atau pendaftar yang berlebihan pada suatu kelas. lalu untuk tombol bayar hanya dapat di klik sekali dan menunggu respons jadi tidak akan terjadi double pembayaran, begitupun saat mengirim bukti pembayaran.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+lalu admin juga dapat melihat list peserta lalu akan memverifikasi siapa saja yang datang seperti absensi. 

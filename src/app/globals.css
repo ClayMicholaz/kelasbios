@@ -3,6 +3,30 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Primary Brand Colors - UBM Navy Blue */
+  --primary-50: #e6eef5;
+  --primary-100: #b3cfe0;
+  --primary-200: #80b0cb;
+  --primary-300: #4d91b6;
+  --primary-400: #1a72a1;
+  --primary-500: #0a4a6e;
+  --primary-600: #083d5c;
+  --primary-700: #062f49;
+  --primary-800: #042237;
+  --primary-900: #021424;
+
+  /* Accent Colors - UBM Cyan/Turquoise */
+  --accent-50: #e6fffe;
+  --accent-100: #b3fff9;
+  --accent-200: #80fff5;
+  --accent-300: #4dfff0;
+  --accent-400: #1affec;
+  --accent-500: #00e5cc;
+  --accent-600: #00b8a3;
+  --accent-700: #008a7a;
+  --accent-800: #005d52;
+  --accent-900: #002f29;
 }
 
 @theme inline {
@@ -10,6 +34,30 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Primary Color Scale */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+
+  /* Accent Color Scale */
+  --color-accent-50: var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
+  --color-accent-900: var(--accent-900);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +71,33 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom utility classes for brand consistency */
+.btn-primary {
+  @apply bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium;
+}
+
+.btn-secondary {
+  @apply bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors font-medium;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+.gradient-primary {
+  background: linear-gradient(
+    135deg,
+    var(--primary-600) 0%,
+    var(--primary-800) 100%
+  );
+}
+
+.gradient-accent {
+  background: linear-gradient(
+    135deg,
+    var(--accent-500) 0%,
+    var(--accent-700) 100%
+  );
 }
