@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   publisher: "Universitas Bunda Mulia",
 
   verification: {
-    google: "b19843a5ec79ff64", // ← Ganti dengan kode verifikasi GSC Anda
+    google: "wCJ4618uQYlQOFViXg5BBcMRC20LpuWdasmIM0iAk80", // ← Ganti dengan kode verifikasi GSC Anda
   },
 
   // Robots - tell search engines how to index
