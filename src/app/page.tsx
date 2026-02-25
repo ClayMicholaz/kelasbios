@@ -8,6 +8,11 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const supabase = await createClient();
 
+  // Check if user is logged in
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   // Get all open classes with enrollment count
   const { data: classes, error } = await supabase
     .from("classes")
@@ -53,12 +58,21 @@ export default async function Home() {
               intensif selama 2 jam!
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                href="/auth/login"
-                className="px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-lg"
-              >
-                Masuk dengan Google UBM
-              </Link>
+              {!user ? (
+                <Link
+                  href="/auth/login"
+                  className="px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-lg"
+                >
+                  Masuk dengan Google UBM
+                </Link>
+              ) : (
+                <Link
+                  href="/dashboard"
+                  className="px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-lg"
+                >
+                  Ke Dashboard
+                </Link>
+              )}
               <Link
                 href="#classes"
                 className="px-8 py-3 bg-transparent text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-lg border-2 border-white"
@@ -215,12 +229,21 @@ export default async function Home() {
             Bergabunglah dengan ribuan mahasiswa yang telah mengambil kelas di
             BIOS LMS
           </p>
-          <Link
-            href="/auth/login"
-            className="inline-block px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-lg shadow-lg"
-          >
-            Masuk Sekarang
-          </Link>
+          {!user ? (
+            <Link
+              href="/auth/login"
+              className="inline-block px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-lg shadow-lg"
+            >
+              Masuk Sekarang
+            </Link>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="inline-block px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-lg shadow-lg"
+            >
+              Lihat Kelas Saya
+            </Link>
+          )}
         </div>
       </section>
     </div>

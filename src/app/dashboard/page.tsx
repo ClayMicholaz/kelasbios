@@ -29,6 +29,11 @@ export default async function DashboardPage() {
     userId: user.id,
   });
 
+  // If user is admin, redirect to admin dashboard
+  if (profile && profile.role === "admin") {
+    redirect("/admin");
+  }
+
   // If profile doesn't exist, create it
   const profileNotFound =
     !profile || (profileError && profileError.code === "PGRST116");
