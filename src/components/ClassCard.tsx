@@ -23,7 +23,7 @@ export default function ClassCard({
   const isFull = availableSeats <= 0;
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow border border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-200 border border-gray-200">
       <div className="p-6">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-xl font-bold text-gray-900 line-clamp-2">
@@ -32,10 +32,10 @@ export default function ClassCard({
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${
               classData.status === "open"
-                ? "bg-green-100 text-green-800"
+                ? "bg-emerald-100 text-emerald-700"
                 : classData.status === "closed"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-gray-100 text-gray-800"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-gray-100 text-gray-700"
             }`}
           >
             {classData.status === "open"
@@ -46,7 +46,7 @@ export default function ClassCard({
           </span>
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+        <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
           {classData.description}
         </p>
 
@@ -133,7 +133,7 @@ export default function ClassCard({
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <div>
-            <p className="text-2xl font-bold text-indigo-600">
+            <p className="text-2xl font-bold text-primary-950">
               {formatCurrency(10000)}
             </p>
             {!isDeadlinePassed && (
@@ -148,10 +148,10 @@ export default function ClassCard({
           {showEnrollButton && classData.status === "open" && (
             <Link
               href={`/class/${classData.id}`}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
                 isDeadlinePassed || isFull
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700"
+                  : "bg-primary-800 text-white hover:bg-primary-700"
               }`}
             >
               {isDeadlinePassed ? "Ditutup" : isFull ? "Penuh" : "Daftar"}

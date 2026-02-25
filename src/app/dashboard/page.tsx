@@ -17,11 +17,96 @@ export default async function DashboardPage() {
   }
 
   // Get user profile
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
+
+  console.log("Dashboard - Profile check:", {
+    profile,
+    profileError,
+    userId: user.id,
+  });
+
+  // If profile doesn't exist, create it
+  const profileNotFound =
+    !profile || (profileError && profileError.code === "PGRST116");
+
+  if (profileNotFound && user.email) {
+    console.log("Dashboard - Creating profile for:", user.email);
+    const emailPrefix = user.email.split("@")[0];
+    const nimMatch = emailPrefix.match(/\d{8}/);
+    const nim = nimMatch ? nimMatch[0] : "";
+
+    const fullName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split("@")[0] ||
+      "User";
+
+    const adminEmails =
+      process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",").map((email) =>
+        email.trim(),
+      ) || [];
+    const isAdmin = adminEmails.includes(user.email);
+
+    const { data: insertData, error: insertError } = await supabase
+      .from("profiles")
+      .insert({
+        id: user.id,
+        email: user.email,
+        full_name: fullName,
+        nim: nim,
+        role: isAdmin ? "admin" : "member",
+      })
+      .select()
+      .single();
+
+    console.log("Dashboard - Profile insert result:", {
+      insertData,
+      insertError,
+    });
+
+    if (insertError) {
+      console.error("Dashboard - Failed to create profile:", insertError);
+    }
+
+    // Re-fetch profile
+    const { data: newProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (newProfile) {
+      return (
+        <div className="min-h-screen bg-gray-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Dashboard Saya
+              </h1>
+              <p className="text-gray-600">
+                Selamat datang,{" "}
+                <span className="font-semibold">{newProfile.full_name}</span>!
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Profil Anda telah dibuat. Silakan refresh halaman.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // Use full name from profile, fallback to user metadata or email
+  const displayName =
+    profile?.full_name ||
+    user.user_metadata?.full_name ||
+    user.user_metadata?.name ||
+    user.email;
 
   // Get user enrollments with class details
   const { data: enrollments } = await supabase
@@ -51,10 +136,7 @@ export default async function DashboardPage() {
             Dashboard Saya
           </h1>
           <p className="text-gray-600">
-            Selamat datang,{" "}
-            <span className="font-semibold">
-              {profile?.full_name || user.email}
-            </span>
+            Selamat datang, <span className="font-semibold">{displayName}</span>
             !
           </p>
         </div>

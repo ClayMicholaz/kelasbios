@@ -23,14 +23,18 @@ export default function AuthCallbackPage() {
         if (errorCode) {
           console.error("OAuth error:", errorCode, errorDescription);
           setError(`Login gagal: ${errorDescription || errorCode}`);
-          setTimeout(() => router.push("/auth/login"), 3000);
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 3000);
           return;
         }
 
         if (!code) {
           console.error("No code found in URL");
           setError("Kode autentikasi tidak ditemukan");
-          setTimeout(() => router.push("/auth/login"), 3000);
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 3000);
           return;
         }
 
@@ -41,7 +45,9 @@ export default function AuthCallbackPage() {
         if (sessionError) {
           console.error("Session exchange error:", sessionError);
           setError(`Gagal membuat sesi: ${sessionError.message}`);
-          setTimeout(() => router.push("/auth/login"), 3000);
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 3000);
           return;
         }
 
@@ -56,7 +62,9 @@ export default function AuthCallbackPage() {
         if (userError || !user) {
           console.error("Get user error:", userError);
           setError("Gagal mendapatkan data user");
-          setTimeout(() => router.push("/auth/login"), 3000);
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 3000);
           return;
         }
 
@@ -73,11 +81,16 @@ export default function AuthCallbackPage() {
           .eq("id", user.id)
           .single();
 
-        console.log("Profile check:", profile, profileFetchError);
+        console.log("Profile check:", { profile, profileFetchError });
 
         // If profile doesn't exist, create one with auto-populated data
-        if (!profile && user.email) {
-          console.log("Creating new profile...");
+        // Check for PGRST116 error code which means "not found"
+        const profileNotFound =
+          !profile ||
+          (profileFetchError && profileFetchError.code === "PGRST116");
+
+        if (profileNotFound && user.email) {
+          console.log("Creating new profile for user:", user.email);
 
           // Extract NIM from email (e.g., s32230111@student.ubm.ac.id -> 32230111)
           const emailPrefix = user.email.split("@")[0];
@@ -121,7 +134,9 @@ export default function AuthCallbackPage() {
           if (insertError) {
             console.error("Profile insert error:", insertError);
             setError(`Gagal membuat profil: ${insertError.message}`);
-            setTimeout(() => router.push("/auth/login"), 3000);
+            setTimeout(() => {
+              router.push("/auth/login");
+            }, 3000);
             return;
           }
 
@@ -129,13 +144,15 @@ export default function AuthCallbackPage() {
         }
 
         console.log("Redirecting to dashboard...");
-        // Force refresh and redirect
+        // Use router.push and router.refresh for proper Next.js navigation
+        router.push("/dashboard");
         router.refresh();
-        window.location.href = "/dashboard";
       } catch (err: any) {
         console.error("Callback handler error:", err);
         setError(`Terjadi kesalahan: ${err.message}`);
-        setTimeout(() => router.push("/auth/login"), 3000);
+        setTimeout(() => {
+          router.push("/auth/login");
+        }, 3000);
       }
     };
 
@@ -143,25 +160,27 @@ export default function AuthCallbackPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary-50 to-accent-50">
-      <div className="text-center max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center max-w-md px-6">
         {error ? (
-          <>
+          <div className="bg-white rounded-lg p-8 border border-red-200 shadow-sm">
             <div className="text-red-500 text-5xl mb-4">⚠️</div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               Autentikasi Gagal
             </h2>
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-red-600 mb-4 text-sm">{error}</p>
             <p className="text-sm text-gray-500">
               Mengalihkan kembali ke halaman login...
             </p>
-          </>
+          </div>
         ) : (
-          <>
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-500 mb-4"></div>
-            <p className="text-gray-600">Memproses autentikasi...</p>
-            <p className="text-sm text-gray-500 mt-2">Mohon tunggu...</p>
-          </>
+          <div className="bg-white rounded-lg p-10 border border-gray-200 shadow-sm">
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-primary-800 mb-4" />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              Memproses Autentikasi
+            </h2>
+            <p className="text-gray-600 text-sm">Mohon tunggu sebentar...</p>
+          </div>
         )}
       </div>
     </div>

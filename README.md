@@ -10,3 +10,56 @@ pendaftar kelas dapat melakukan pembayaran ke rekening 100271468145
 lalu buatkan juga halaman untuk error seperti 404, dan 403. lalu pastikan setiap pembayaran tidak overlapping jadi tidak akan terjadi overseat atau pendaftar yang berlebihan pada suatu kelas. lalu untuk tombol bayar hanya dapat di klik sekali dan menunggu respons jadi tidak akan terjadi double pembayaran, begitupun saat mengirim bukti pembayaran.
 
 lalu admin juga dapat melihat list peserta lalu akan memverifikasi siapa saja yang datang seperti absensi. 
+---
+
+## 🚀 Development
+
+### Menjalankan Server Development
+
+```bash
+npm run dev
+```
+
+Server akan berjalan di [http://localhost:3000](http://localhost:3000)
+
+### Troubleshooting: Lock File Error
+
+Jika mengalami error:
+```
+⨯ Unable to acquire lock at .next\dev\lock, is another instance of next dev running?
+```
+
+**Solusi 1 - Menggunakan script otomatis:**
+```bash
+npm run clean-dev
+```
+
+**Solusi 2 - Manual:**
+```powershell
+# 1. Stop semua proses Node.js
+Get-Process | Where-Object {$_.ProcessName -like "*node*"} | Stop-Process -Force
+
+# 2. Hapus folder dev
+Remove-Item ".\.next\dev" -Recurse -Force
+
+# 3. Jalankan ulang
+npm run dev
+```
+
+### Build Production
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 📝 Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth (Google OAuth)
+- **Styling:** Tailwind CSS v4
+- **Language:** TypeScript
+- **Deployment:** Vercel
