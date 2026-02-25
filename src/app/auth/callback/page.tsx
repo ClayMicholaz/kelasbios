@@ -42,6 +42,9 @@ export default function AuthCallbackPage() {
         const { data: sessionData, error: sessionError } =
           await supabase.auth.exchangeCodeForSession(code);
 
+        console.log("Exchange result - data:", sessionData ? "exists" : "null");
+        console.log("Exchange result - error:", sessionError);
+
         if (sessionError) {
           console.error("Session exchange error:", sessionError);
           setError(`Gagal membuat sesi: ${sessionError.message}`);
@@ -51,16 +54,14 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        console.log("Session created:", sessionData);
+        console.log("Session created successfully!");
+        console.log("Session user:", sessionData?.session?.user?.email);
 
-        // Get user data after OAuth
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
+        // Get user from session (faster than getUser, no hanging)
+        const user = sessionData?.session?.user;
 
-        if (userError || !user) {
-          console.error("Get user error:", userError);
+        if (!user) {
+          console.error("No user in session");
           setError("Gagal mendapatkan data user");
           setTimeout(() => {
             router.push("/auth/login");
@@ -72,8 +73,10 @@ export default function AuthCallbackPage() {
           id: user.id,
           email: user.email,
           metadata: user.user_metadata,
+          avatar_url: user.user_metadata?.avatar_url,
         });
 
+        console.log("Checking if profile exists in database...");
         // Check if profile exists
         const { data: profile, error: profileFetchError } = await supabase
           .from("profiles")
@@ -81,7 +84,13 @@ export default function AuthCallbackPage() {
           .eq("id", user.id)
           .single();
 
-        console.log("Profile check:", { profile, profileFetchError });
+        console.log("Profile check result:");
+        console.log("  - Profile data:", profile);
+        console.log(
+          "  - Profile error:",
+          profileFetchError?.code,
+          profileFetchError?.message,
+        );
 
         // If profile doesn't exist, create one with auto-populated data
         // Check for PGRST116 error code which means "not found"
@@ -90,7 +99,10 @@ export default function AuthCallbackPage() {
           (profileFetchError && profileFetchError.code === "PGRST116");
 
         if (profileNotFound && user.email) {
-          console.log("Creating new profile for user:", user.email);
+          console.log(
+            "Profile not found - Creating new profile for:",
+            user.email,
+          );
 
           // Extract NIM from email (e.g., s32230111@student.ubm.ac.id -> 32230111)
           const emailPrefix = user.email.split("@")[0];
@@ -119,6 +131,7 @@ export default function AuthCallbackPage() {
             role: isAdmin ? "admin" : "member",
           });
 
+          console.log("Inserting profile to database...");
           const { data: insertedProfile, error: insertError } = await supabase
             .from("profiles")
             .insert({
@@ -130,6 +143,10 @@ export default function AuthCallbackPage() {
             })
             .select()
             .single();
+
+          console.log("Insert result:");
+          console.log("  - Inserted profile:", insertedProfile);
+          console.log("  - Insert error:", insertError);
 
           if (insertError) {
             console.error("Profile insert error:", insertError);
@@ -143,10 +160,11 @@ export default function AuthCallbackPage() {
           console.log("Profile created successfully:", insertedProfile);
         }
 
-        console.log("Redirecting to dashboard...");
-        // Use router.push and router.refresh for proper Next.js navigation
-        router.push("/dashboard");
-        router.refresh();
+        console.log("Authentication complete! Redirecting to dashboard...");
+
+        // Force a full page redirect to ensure proper state initialization
+        // Using window.location instead of router.push for more reliable redirect
+        window.location.href = "/dashboard";
       } catch (err: any) {
         console.error("Callback handler error:", err);
         setError(`Terjadi kesalahan: ${err.message}`);

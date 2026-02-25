@@ -28,7 +28,7 @@ export default function Navbar() {
           data: { session },
         } = await supabase.auth.getSession();
 
-        console.log("[Navbar] Session:", session?.user?.email);
+        console.log("[Navbar] Session:", session?.user?.email || "No session");
 
         if (!isMounted) return;
 
@@ -49,12 +49,21 @@ export default function Navbar() {
           if (isMounted) {
             setProfile(profileData);
           }
+        } else {
+          // Clear profile if no user
+          console.log("[Navbar] No user, clearing profile");
+          if (isMounted) {
+            setProfile(null);
+          }
         }
       } catch (error) {
         console.error("[Navbar] Error loading user:", error);
       } finally {
         if (isMounted) {
-          console.log("[Navbar] Setting loading to false");
+          console.log(
+            "[Navbar] Setting loading to false, user:",
+            user?.email || "No user",
+          );
           setLoading(false);
         }
       }
@@ -72,8 +81,17 @@ export default function Navbar() {
         const user = session?.user ?? null;
         setUser(user);
 
+        // Set loading false IMMEDIATELY - don't wait for profile
+        setLoading(false);
+        console.log(
+          "[Navbar] Loading set to false, user:",
+          user?.email || "none",
+        );
+
         if (user) {
           console.log("[Navbar] Auth change - Fetching profile for:", user.id);
+
+          // Fetch profile async (don't block loading state)
           const { data, error } = await supabase
             .from("profiles")
             .select("*")
@@ -81,14 +99,20 @@ export default function Navbar() {
             .single();
 
           console.log("[Navbar] Auth change - Profile data:", data);
-          console.log("[Navbar] Auth change - Profile error:", error);
+          console.log(
+            "[Navbar] Auth change - Profile error:",
+            error?.code,
+            error?.message,
+          );
 
           if (isMounted) {
             setProfile(data);
+            console.log("[Navbar] Profile set:", data?.full_name || "null");
           }
         } else {
           if (isMounted) {
             setProfile(null);
+            console.log("[Navbar] Profile cleared (no user)");
           }
         }
       } catch (error) {
@@ -116,6 +140,68 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Log render state changes for debugging
+  useEffect(() => {
+    console.log(
+      "[Navbar] Render state - Loading:",
+      loading,
+      "User:",
+      user?.email || "none",
+      "Profile:",
+      profile?.full_name || "none",
+    );
+  }, [loading, user, profile]);
+
+  // Log avatar changes for debugging
+  useEffect(() => {
+    if (user) {
+      console.log("[Navbar] User avatar URL:", user.user_metadata?.avatar_url);
+      console.log("[Navbar] Profile name:", profile?.full_name);
+      console.log("[Navbar] Profile role:", profile?.role);
+      console.log("[Navbar] Profile ID:", profile?.id);
+      console.log("[Navbar] User email:", user.email);
+      console.log("[Navbar] Is admin check:", profile?.role === "admin");
+    }
+  }, [user, profile]);
+
+  // Retry profile fetch if user exists but profile is null (race condition with dashboard profile creation)
+  useEffect(() => {
+    if (!user || profile) return; // Only retry if user exists but profile is null
+
+    console.log(
+      "[Navbar] Profile is null, scheduling retry fetch in 2 seconds...",
+    );
+
+    const retryTimer = setTimeout(async () => {
+      const supabase = createClient();
+      console.log("[Navbar] Retry - Fetching profile for:", user.id);
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      console.log("[Navbar] Retry - Profile data:", data);
+      console.log(
+        "[Navbar] Retry - Profile error:",
+        error?.code,
+        error?.message,
+      );
+
+      if (data) {
+        setProfile(data);
+        console.log("[Navbar] Retry - Profile found and set:", data.full_name);
+      } else {
+        console.log(
+          "[Navbar] Retry - Profile still not found, will not retry again",
+        );
+      }
+    }, 2000);
+
+    return () => clearTimeout(retryTimer);
+  }, [user, profile]);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -199,6 +285,7 @@ export default function Navbar() {
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center space-x-2 focus:outline-none group"
+                  aria-label="Profile menu"
                 >
                   <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-accent-bright/40 group-hover:ring-accent-bright transition-all">
                     {user.user_metadata?.avatar_url ? (
@@ -208,6 +295,10 @@ export default function Navbar() {
                         width={40}
                         height={40}
                         className="object-cover"
+                        unoptimized
+                        onError={(e) => {
+                          console.error("[Navbar] Image load error:", e);
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary-600 to-accent-600 flex items-center justify-center text-white font-bold text-lg">
@@ -233,6 +324,11 @@ export default function Navbar() {
                           Admin
                         </span>
                       )}
+                      {/* Debug info - remove after testing */}
+                      <p className="text-xs text-gray-400 mt-2">
+                        Role: {profile?.role || "not set"} | NIM:{" "}
+                        {profile?.nim || "not set"}
+                      </p>
                     </div>
 
                     {profile?.role === "admin" ? (

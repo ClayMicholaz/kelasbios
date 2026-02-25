@@ -11,27 +11,39 @@ export default function PolicyCard() {
   const [accepting, setAccepting] = useState(false);
 
   useEffect(() => {
+    console.log("[PolicyCard] Component mounted");
     checkPolicyAcceptance();
   }, []);
 
   const checkPolicyAcceptance = async () => {
+    console.log("[PolicyCard] Checking policy acceptance...");
     try {
       const supabase = createClient();
+      console.log("[PolicyCard] Getting session...");
+
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const user = session?.user;
+      console.log("[PolicyCard] User:", user?.email || "Not logged in");
 
       if (!user) {
+        console.log("[PolicyCard] No user, hiding card");
         setLoading(false);
         return;
       }
 
       // Check if user has accepted policies
-      const { data } = await supabase
+      console.log("[PolicyCard] Checking database for user:", user.id);
+      const { data, error } = await supabase
         .from("policy_acceptance")
         .select("*")
         .eq("user_id", user.id)
         .single();
+
+      console.log("[PolicyCard] Policy data:", data);
+      console.log("[PolicyCard] Policy error:", error);
 
       // If user has accepted, hide the card permanently
       if (
@@ -39,12 +51,16 @@ export default function PolicyCard() {
         data.privacy_policy_accepted &&
         data.terms_of_service_accepted
       ) {
+        console.log("[PolicyCard] User already accepted, hiding card");
         setIsDismissed(true);
+      } else {
+        console.log("[PolicyCard] User has NOT accepted, showing card");
       }
 
       setLoading(false);
+      console.log("[PolicyCard] Loading complete");
     } catch (error) {
-      console.error("Error checking policy acceptance:", error);
+      console.error("[PolicyCard] Error checking policy acceptance:", error);
       setLoading(false);
     }
   };
@@ -54,9 +70,10 @@ export default function PolicyCard() {
     try {
       const supabase = createClient();
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
+      const user = session?.user;
       if (!user) return;
 
       // Upsert policy acceptance

@@ -84,29 +84,24 @@ export default function CreateClassPage() {
 
       console.log("[CreateClass] Getting authenticated user...");
 
-      let authResult;
-      try {
-        authResult = await supabase.auth.getUser();
-        console.log("[CreateClass] ✓ Auth call completed");
-        console.log("[CreateClass] Auth result:", authResult);
-      } catch (authCallError) {
-        console.error("[CreateClass] ✗ Auth call threw error:", authCallError);
-        throw authCallError;
-      }
-
+      // Use getSession instead of getUser - more reliable, doesn't hang
       const {
-        data: { user },
+        data: { session },
         error: authError,
-      } = authResult;
+      } = await supabase.auth.getSession();
 
-      console.log("[CreateClass] Extracted user:", user);
-      console.log("[CreateClass] Extracted authError:", authError);
+      console.log("[CreateClass] ✓ Session retrieved");
+      console.log(
+        "[CreateClass] Session:",
+        session?.user?.email || "No session",
+      );
 
       if (authError) {
         console.error("[CreateClass] Auth error:", authError);
         throw new Error(`Authentication error: ${authError.message}`);
       }
 
+      const user = session?.user;
       if (!user) {
         console.error("[CreateClass] No authenticated user");
         throw new Error("Not authenticated");
@@ -173,9 +168,9 @@ export default function CreateClassPage() {
 
             if (uploadError) {
               console.error("[CreateClass] Upload error details:", {
-                message: uploadError.message,
-                statusCode: uploadError.statusCode,
-                name: uploadError.name,
+                message: uploadError?.message,
+                statusCode: uploadError?.statusCode,
+                name: uploadError?.name,
               });
               throw uploadError;
             }
@@ -256,12 +251,14 @@ export default function CreateClassPage() {
 
         if (insertError) {
           console.error("[CreateClass] Database insert error details:", {
-            code: insertError.code,
-            message: insertError.message,
-            details: insertError.details,
-            hint: insertError.hint,
+            code: insertError?.code,
+            message: insertError?.message,
+            details: insertError?.details,
+            hint: insertError?.hint,
           });
-          throw new Error(`Database error: ${insertError.message}`);
+          throw new Error(
+            `Database error: ${insertError?.message || "Unknown error"}`,
+          );
         }
 
         if (!insertedData || insertedData.length === 0) {
