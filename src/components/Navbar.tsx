@@ -15,6 +15,7 @@ export default function Navbar() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -203,39 +204,65 @@ export default function Navbar() {
     return () => clearTimeout(retryTimer);
   }, [user, profile]);
 
+const forceRefreshProfile = async () => {
+    if (!user) return;
+    
+    setRefreshing(true);
+    console.log("[Navbar] Force refreshing profile...");
+    
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      
+      if (error) {
+        console.error("[Navbar] Force refresh error:", error);
+      } else {
+        console.log("[Navbar] Force refresh - New profile data:", data);
+        setProfile(data);
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const handleLogout = async () => {
     console.log("[Navbar] Logout button clicked");
     try {
       const supabase = createClient();
-
-      console.log("[Navbar] Clearing localStorage...");
-      // Clear localStorage (including policy acceptance cache)
-      localStorage.removeItem("policy_accepted");
-      localStorage.removeItem("policy_checked_at");
+      
+      console.log("[Navbar] Clearing ALL storage...");
+      // Clear ALL localStorage and sessionStorage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear specific cookies
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
 
       console.log("[Navbar] Signing out from Supabase...");
       // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        console.error("[Navbar] Supabase signOut error:", error);
-        throw error;
-      }
-
-      console.log("[Navbar] SignOut successful, clearing state...");
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      console.log("[Navbar] Clearing state...");
       // Clear state
       setUser(null);
       setProfile(null);
       setDropdownOpen(false);
 
       console.log("[Navbar] Redirecting to login...");
-      // Redirect to login page
-      window.location.href = "/auth/login";
+      // Force complete page reload to clear all state
+      window.location.replace("/auth/login");
     } catch (error) {
       console.error("[Navbar] Logout error:", error);
-      // Force reload on error
-      alert("Terjadi kesalahan saat logout. Halaman akan di-refresh.");
-      window.location.href = "/auth/login";
+      // Force complete reload on error
+      window.location.replace("/auth/login");
     }
   };
 
@@ -359,6 +386,18 @@ export default function Navbar() {
                         Role: {profile?.role || "not set"} | NIM:{" "}
                         {profile?.nim || "not set"}
                       </p>
+                      
+                      {/* Force Refresh Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          forceRefreshProfile();
+                        }}
+                        disabled={refreshing}
+                        className="mt-2 w-full px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs rounded transition-colors disabled:opacity-50"
+                      >
+                        {refreshing ? "Refreshing..." : "🔄 Refresh Profile"}
+                      </button>
                     </div>
 
                     {profile?.role === "admin" ? (
