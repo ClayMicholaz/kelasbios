@@ -204,32 +204,37 @@ export default function Navbar() {
   }, [user, profile]);
 
   const handleLogout = async () => {
+    console.log("[Navbar] Logout button clicked");
     try {
       const supabase = createClient();
 
+      console.log("[Navbar] Clearing localStorage...");
       // Clear localStorage (including policy acceptance cache)
       localStorage.removeItem("policy_accepted");
       localStorage.removeItem("policy_checked_at");
 
+      console.log("[Navbar] Signing out from Supabase...");
       // Sign out from Supabase
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
 
+      if (error) {
+        console.error("[Navbar] Supabase signOut error:", error);
+        throw error;
+      }
+
+      console.log("[Navbar] SignOut successful, clearing state...");
       // Clear state
       setUser(null);
       setProfile(null);
       setDropdownOpen(false);
 
-      // Redirect and refresh
-      router.push("/auth/login");
-      router.refresh();
-
-      // Force reload to ensure clean state
-      setTimeout(() => {
-        window.location.href = "/auth/login";
-      }, 100);
+      console.log("[Navbar] Redirecting to login...");
+      // Redirect to login page
+      window.location.href = "/auth/login";
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("[Navbar] Logout error:", error);
       // Force reload on error
+      alert("Terjadi kesalahan saat logout. Halaman akan di-refresh.");
       window.location.href = "/auth/login";
     }
   };
@@ -326,7 +331,7 @@ export default function Navbar() {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-primary-600 to-accent-600 flex items-center justify-center text-white font-bold text-lg">
+                      <div className="w-full h-full bg-linear-to-br from-primary-600 to-accent-600 flex items-center justify-center text-white font-bold text-lg">
                         {(profile?.full_name || user.email || "U")
                           .charAt(0)
                           .toUpperCase()}
@@ -345,7 +350,7 @@ export default function Navbar() {
                         {user.email}
                       </p>
                       {profile?.role === "admin" && (
-                        <span className="inline-block mt-2 px-2 py-1 bg-gradient-to-r from-primary-600 to-accent-600 text-white text-xs font-semibold rounded">
+                        <span className="inline-block mt-2 px-2 py-1 bg-linear-to-r from-primary-600 to-accent-600 text-white text-xs font-semibold rounded">
                           Admin
                         </span>
                       )}
@@ -400,7 +405,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/auth/login"
-                className="px-5 py-2.5 bg-gradient-to-r from-accent-bright to-accent-500 text-primary-950 rounded-lg hover:from-accent-400 hover:to-accent-600 transition-all duration-200 text-sm font-bold"
+                className="px-5 py-2.5 bg-linear-to-r from-accent-bright to-accent-500 text-primary-950 rounded-lg hover:from-accent-400 hover:to-accent-600 transition-all duration-200 text-sm font-bold"
               >
                 Masuk dengan Google UBM
               </Link>
