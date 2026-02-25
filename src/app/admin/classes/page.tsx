@@ -61,6 +61,26 @@ export default async function AdminClassesPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Link
+          href="/admin"
+          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
+        >
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Kembali ke Dashboard
+        </Link>
+
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -70,7 +90,7 @@ export default async function AdminClassesPage() {
           </div>
           <Link
             href="/admin/classes/create"
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium flex items-center"
+            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -124,7 +144,7 @@ export default async function AdminClassesPage() {
                   <div className="mt-2 flex gap-2">
                     <Link
                       href={`/admin/classes/${classItem.id}`}
-                      className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-center text-sm font-medium"
+                      className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-center text-sm font-medium"
                     >
                       Detail & Absensi
                     </Link>
@@ -202,7 +222,7 @@ export default async function AdminClassesPage() {
             </p>
             <Link
               href="/admin/classes/create"
-              className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+              className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
             >
               Buat Kelas Baru
             </Link>

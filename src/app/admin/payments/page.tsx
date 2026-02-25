@@ -45,6 +45,20 @@ export default async function AdminPaymentsPage() {
     .eq("payment_status", "pending")
     .order("created_at", { ascending: false });
 
+  // Get verified enrollments count per class for capacity check
+  const classEnrollmentCounts: Record<string, number> = {};
+  if (pendingEnrollments) {
+    for (const enrollment of pendingEnrollments) {
+      const classId = enrollment.class_id;
+      const { data } = await supabase
+        .from("enrollments")
+        .select("id")
+        .eq("class_id", classId)
+        .eq("payment_status", "verified");
+      classEnrollmentCounts[classId] = data?.length || 0;
+    }
+  }
+
   // Get verified enrollments
   const { data: verifiedEnrollments } = await supabase
     .from("enrollments")
@@ -62,6 +76,26 @@ export default async function AdminPaymentsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Link
+          href="/admin"
+          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
+        >
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Kembali ke Dashboard
+        </Link>
+
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Verifikasi Pembayaran
@@ -87,7 +121,7 @@ export default async function AdminPaymentsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
             <p className="text-sm text-gray-600 mb-1">Total Pemasukan</p>
-            <p className="text-2xl font-bold text-indigo-600">
+            <p className="text-2xl font-bold text-primary-600">
               {formatCurrency((verifiedEnrollments?.length || 0) * 10000)}
             </p>
           </div>
@@ -112,7 +146,7 @@ export default async function AdminPaymentsPage() {
                         Informasi Peserta
                       </h3>
                       <div className="space-y-1 text-sm">
-                        <p className="font-semibold text-indigo-600">
+                        <p className="font-semibold text-primary-600">
                           {(enrollment.profiles as any)?.full_name}
                         </p>
                         <p className="text-gray-600">
@@ -141,7 +175,7 @@ export default async function AdminPaymentsPage() {
                         <p className="text-gray-600">
                           Ruangan: {(enrollment.classes as any)?.classroom}
                         </p>
-                        <p className="font-bold text-indigo-600 mt-2">
+                        <p className="font-bold text-primary-600 mt-2">
                           {formatCurrency(10000)}
                         </p>
                       </div>
@@ -169,6 +203,13 @@ export default async function AdminPaymentsPage() {
                           <PaymentVerification
                             enrollmentId={enrollment.id}
                             adminId={user.id}
+                            classId={enrollment.class_id}
+                            maxParticipants={
+                              (enrollment.classes as any)?.max_participants || 0
+                            }
+                            currentVerified={
+                              classEnrollmentCounts[enrollment.class_id] || 0
+                            }
                           />
                         </div>
                       ) : (
@@ -251,7 +292,7 @@ export default async function AdminPaymentsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-semibold text-indigo-600">
+                          <div className="text-sm font-semibold text-primary-600">
                             {formatCurrency(10000)}
                           </div>
                         </td>

@@ -18,14 +18,16 @@ function ErrorContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-50 to-orange-100 px-4">
-      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg text-center">
-        <div className="text-red-500 text-5xl mb-4">⚠</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{message}</h2>
-        <p className="text-gray-600 mb-6">{description}</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 px-4 py-8">
+      <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-xl shadow-lg text-center">
+        <div className="text-primary-600 text-5xl mb-4">⚠</div>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+          {message}
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-6">{description}</p>
         <Link
           href="/auth/login"
-          className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
         >
           Kembali ke Login
         </Link>

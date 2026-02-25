@@ -18,6 +18,7 @@ export default function CreateClassPage() {
     max_participants: 30,
     class_date: "",
     class_time: "",
+    class_end_time: "",
     registration_deadline: "",
   });
 
@@ -71,15 +72,57 @@ export default function CreateClassPage() {
     setError(null);
     setLoading(true);
 
+    console.log("[CreateClass] Starting form submission");
+    console.log("[CreateClass] Form data:", formData);
+    console.log("[CreateClass] About to enter try block...");
+
     try {
+      console.log("[CreateClass] Inside try block");
+      console.log("[CreateClass] Creating supabase client...");
       const supabase = createClient();
+      console.log("[CreateClass] Supabase client created successfully");
+
+      console.log("[CreateClass] Getting authenticated user...");
+
+      let authResult;
+      try {
+        authResult = await supabase.auth.getUser();
+        console.log("[CreateClass] ✓ Auth call completed");
+        console.log("[CreateClass] Auth result:", authResult);
+      } catch (authCallError) {
+        console.error("[CreateClass] ✗ Auth call threw error:", authCallError);
+        throw authCallError;
+      }
+
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+        error: authError,
+      } = authResult;
 
-      if (!user) throw new Error("Not authenticated");
+      console.log("[CreateClass] Extracted user:", user);
+      console.log("[CreateClass] Extracted authError:", authError);
+
+      if (authError) {
+        console.error("[CreateClass] Auth error:", authError);
+        throw new Error(`Authentication error: ${authError.message}`);
+      }
+
+      if (!user) {
+        console.error("[CreateClass] No authenticated user");
+        throw new Error("Not authenticated");
+      }
+
+      console.log("[CreateClass] User authenticated:", user.id);
+      console.log("[CreateClass] User email:", user.email);
 
       // Validate dates
+      console.log("[CreateClass] Validating dates...");
+      console.log("[CreateClass] Class date:", formData.class_date);
+      console.log(
+        "[CreateClass] Registration deadline:",
+        formData.registration_deadline,
+      );
+
       const classDate = new Date(formData.class_date);
       const deadline = new Date(formData.registration_deadline);
 
@@ -87,38 +130,86 @@ export default function CreateClassPage() {
         throw new Error("Batas pendaftaran harus sebelum tanggal kelas");
       }
 
+      console.log("[CreateClass] Date validation passed");
+
       // Validate practice questions JSON if provided
       let parsedQuestions = null;
       if (practiceQuestions.trim() !== "") {
+        console.log("[CreateClass] Parsing practice questions...");
         try {
           parsedQuestions = JSON.parse(practiceQuestions);
-        } catch {
+          console.log(
+            "[CreateClass] Parsed practice questions:",
+            parsedQuestions,
+          );
+        } catch (parseError) {
+          console.error("[CreateClass] JSON parse error:", parseError);
           throw new Error("Format JSON soal latihan tidak valid");
         }
       }
 
       // Upload PDF files to storage
       let uploadedFiles: Array<{ name: string; url: string }> = [];
+      console.log("[CreateClass] Checking files, count:", materialFiles.length);
+
       if (materialFiles.length > 0) {
+        console.log("[CreateClass] Uploading", materialFiles.length, "files");
         setUploadingFiles(true);
 
         for (const file of materialFiles) {
           const fileName = `${Date.now()}_${file.name}`;
-          const { error: uploadError, data } = await supabase.storage
-            .from("class-materials")
-            .upload(fileName, file);
+          console.log(
+            "[CreateClass] Uploading file:",
+            fileName,
+            "Size:",
+            file.size,
+            "bytes",
+          );
 
-          if (uploadError) throw uploadError;
+          try {
+            const { error: uploadError, data } = await supabase.storage
+              .from("class-materials")
+              .upload(fileName, file);
 
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from("class-materials").getPublicUrl(fileName);
+            if (uploadError) {
+              console.error("[CreateClass] Upload error details:", {
+                message: uploadError.message,
+                statusCode: uploadError.statusCode,
+                name: uploadError.name,
+              });
+              throw uploadError;
+            }
 
-          uploadedFiles.push({
-            name: file.name,
-            url: publicUrl,
-          });
+            console.log("[CreateClass] File uploaded:", fileName);
+
+            const {
+              data: { publicUrl },
+            } = supabase.storage.from("class-materials").getPublicUrl(fileName);
+
+            console.log("[CreateClass] Got public URL:", publicUrl);
+
+            uploadedFiles.push({
+              name: file.name,
+              url: publicUrl,
+            });
+
+            console.log(
+              "[CreateClass] File added to list, total:",
+              uploadedFiles.length,
+            );
+          } catch (uploadErr) {
+            console.error("[CreateClass] File upload caught error:", uploadErr);
+            throw uploadErr;
+          }
         }
+        console.log(
+          "[CreateClass] All",
+          uploadedFiles.length,
+          "files uploaded successfully",
+        );
+        setUploadingFiles(false);
+      } else {
+        console.log("[CreateClass] No files to upload, skipping");
       }
 
       // Filter out empty materials and combine with uploaded files
@@ -127,23 +218,80 @@ export default function CreateClassPage() {
         .map((m) => ({ name: m, url: null }));
       const allMaterials = [...textMaterials, ...uploadedFiles];
 
-      const { error: insertError } = await supabase.from("classes").insert({
-        ...formData,
+      console.log("[CreateClass] Preparing to insert class data");
+
+      // Prepare insert data - only include class_end_time if it has a value
+      const insertData: any = {
+        title: formData.title,
+        description: formData.description,
+        duration_hours: formData.duration_hours,
+        classroom: formData.classroom,
+        max_participants: formData.max_participants,
+        class_date: formData.class_date,
+        class_time: formData.class_time,
+        registration_deadline: formData.registration_deadline,
         materials: allMaterials.length > 0 ? allMaterials : null,
         practice_questions: parsedQuestions,
         created_by: user.id,
         status: "open",
-      });
+      };
 
-      if (insertError) throw insertError;
+      // Only add class_end_time if it has a value (optional field)
+      if (formData.class_end_time) {
+        insertData.class_end_time = formData.class_end_time;
+      }
 
-      router.push("/admin/classes");
-      router.refresh();
+      console.log("[CreateClass] Insert data prepared:", insertData);
+      console.log("[CreateClass] Starting database insert...");
+
+      try {
+        const { data: insertedData, error: insertError } = await supabase
+          .from("classes")
+          .insert(insertData)
+          .select();
+
+        console.log("[CreateClass] Insert completed");
+        console.log("[CreateClass] Insert error:", insertError);
+        console.log("[CreateClass] Inserted data:", insertedData);
+
+        if (insertError) {
+          console.error("[CreateClass] Database insert error details:", {
+            code: insertError.code,
+            message: insertError.message,
+            details: insertError.details,
+            hint: insertError.hint,
+          });
+          throw new Error(`Database error: ${insertError.message}`);
+        }
+
+        if (!insertedData || insertedData.length === 0) {
+          throw new Error("No data returned from insert");
+        }
+
+        console.log("[CreateClass] Class created successfully:", insertedData);
+        console.log("[CreateClass] Redirecting to /admin/classes");
+
+        router.push("/admin/classes");
+        router.refresh();
+      } catch (dbError: any) {
+        console.error("[CreateClass] Database operation failed:", dbError);
+        throw dbError;
+      }
     } catch (err: any) {
+      console.error("[CreateClass] =================================");
+      console.error("[CreateClass] ERROR CAUGHT IN MAIN HANDLER");
+      console.error("[CreateClass] Error type:", typeof err);
+      console.error("[CreateClass] Error name:", err?.name);
+      console.error("[CreateClass] Error message:", err?.message);
+      console.error("[CreateClass] Error stack:", err?.stack);
+      console.error("[CreateClass] Full error object:", err);
+      console.error("[CreateClass] =================================");
       setError(err.message || "Terjadi kesalahan saat membuat kelas");
     } finally {
+      console.log("[CreateClass] Finally block - cleaning up");
       setLoading(false);
       setUploadingFiles(false);
+      console.log("[CreateClass] Loading state set to false");
     }
   };
 
@@ -152,7 +300,7 @@ export default function CreateClassPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/admin/classes"
-          className="inline-flex items-center text-indigo-600 hover:text-indigo-700 mb-6"
+          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
         >
           <svg
             className="w-5 h-5 mr-2"
@@ -193,7 +341,7 @@ export default function CreateClassPage() {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="Contoh: Pengenalan React.js"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               />
             </div>
 
@@ -208,7 +356,7 @@ export default function CreateClassPage() {
                 onChange={handleChange}
                 rows={4}
                 placeholder="Jelaskan detail tentang kelas ini..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               />
             </div>
 
@@ -225,7 +373,7 @@ export default function CreateClassPage() {
                   step="0.5"
                   value={formData.duration_hours}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
@@ -240,7 +388,7 @@ export default function CreateClassPage() {
                   value={formData.classroom}
                   onChange={handleChange}
                   placeholder="Contoh: Lab 301"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                 />
               </div>
             </div>
@@ -256,11 +404,11 @@ export default function CreateClassPage() {
                 min="1"
                 value={formData.max_participants}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tanggal Kelas *
@@ -271,13 +419,13 @@ export default function CreateClassPage() {
                   required
                   value={formData.class_date}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Waktu Kelas *
+                  Waktu Mulai *
                 </label>
                 <input
                   type="time"
@@ -285,8 +433,24 @@ export default function CreateClassPage() {
                   required
                   value={formData.class_time}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Waktu Selesai (Opsional)
+                </label>
+                <input
+                  type="time"
+                  name="class_end_time"
+                  value={formData.class_end_time}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Kosongkan jika belum migrate database
+                </p>
               </div>
             </div>
 
@@ -300,7 +464,7 @@ export default function CreateClassPage() {
                 required
                 value={formData.registration_deadline}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               />
               <p className="text-sm text-gray-500 mt-1">
                 Harus sebelum tanggal kelas
@@ -321,7 +485,7 @@ export default function CreateClassPage() {
                         handleMaterialChange(index, e.target.value)
                       }
                       placeholder="Contoh: Introduction to React Components"
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
                     />
                     {materials.length > 1 && (
                       <button
@@ -337,7 +501,7 @@ export default function CreateClassPage() {
                 <button
                   type="button"
                   onClick={addMaterial}
-                  className="text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                  className="text-primary-600 hover:text-primary-700 text-sm font-medium"
                 >
                   + Tambah Materi
                 </button>
@@ -354,7 +518,7 @@ export default function CreateClassPage() {
                   accept=".pdf"
                   multiple
                   onChange={handleFileChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                 />
                 {materialFiles.length > 0 && (
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -398,7 +562,7 @@ export default function CreateClassPage() {
                 onChange={(e) => setPracticeQuestions(e.target.value)}
                 rows={8}
                 placeholder='[{"question": "Apa itu React?", "options": ["A. Framework", "B. Library", "C. Language"], "answer": "B"}]'
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm text-gray-900"
               />
               <p className="text-sm text-gray-500 mt-1">
                 Masukkan soal latihan dalam format JSON array. Opsional.
@@ -409,7 +573,7 @@ export default function CreateClassPage() {
               <button
                 type="submit"
                 disabled={loading || uploadingFiles}
-                className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {uploadingFiles
                   ? "Mengupload file..."

@@ -2,27 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { User } from "@supabase/supabase-js";
 import { Profile } from "@/types";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
     const supabase = createClient();
 
     const getUser = async () => {
+      console.log("[Navbar] Starting to fetch user...");
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
+
+        console.log("[Navbar] Session:", session?.user?.email);
 
         if (!isMounted) return;
 
@@ -30,20 +36,25 @@ export default function Navbar() {
         setUser(user);
 
         if (user) {
-          const { data: profileData } = await supabase
+          console.log("[Navbar] Fetching profile for:", user.id);
+          const { data: profileData, error: profileError } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", user.id)
             .single();
+
+          console.log("[Navbar] Profile data:", profileData);
+          console.log("[Navbar] Profile error:", profileError);
 
           if (isMounted) {
             setProfile(profileData);
           }
         }
       } catch (error) {
-        console.error("Error loading user:", error);
+        console.error("[Navbar] Error loading user:", error);
       } finally {
         if (isMounted) {
+          console.log("[Navbar] Setting loading to false");
           setLoading(false);
         }
       }
@@ -54,24 +65,34 @@ export default function Navbar() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log("[Navbar] Auth state changed:", _event, session?.user?.email);
       if (!isMounted) return;
 
-      const user = session?.user ?? null;
-      setUser(user);
+      try {
+        const user = session?.user ?? null;
+        setUser(user);
 
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        if (isMounted) {
-          setProfile(data);
+        if (user) {
+          console.log("[Navbar] Auth change - Fetching profile for:", user.id);
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+
+          console.log("[Navbar] Auth change - Profile data:", data);
+          console.log("[Navbar] Auth change - Profile error:", error);
+
+          if (isMounted) {
+            setProfile(data);
+          }
+        } else {
+          if (isMounted) {
+            setProfile(null);
+          }
         }
-      } else {
-        if (isMounted) {
-          setProfile(null);
-        }
+      } catch (error) {
+        console.error("[Navbar] Error in auth state change:", error);
       }
     });
 
@@ -80,6 +101,27 @@ export default function Navbar() {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/auth/login");
+  };
 
   const isActive = (path: string) => pathname === path;
 
@@ -151,18 +193,88 @@ export default function Navbar() {
 
           <div className="flex items-center space-x-4">
             {loading ? (
-              <div className="h-10 w-28 bg-primary-700/50 animate-pulse rounded-lg"></div>
+              <div className="h-10 w-10 bg-primary-700/50 animate-pulse rounded-full"></div>
             ) : user ? (
-              <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-200 hidden sm:block font-medium">
-                  {profile?.full_name || user.email}
-                </span>
-                <Link
-                  href="/auth/logout"
-                  className="px-4 py-2 bg-red-500/90 text-white rounded-lg hover:bg-red-600 transition-all duration-200 text-sm font-medium"
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center space-x-2 focus:outline-none group"
                 >
-                  Keluar
-                </Link>
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-accent-bright/40 group-hover:ring-accent-bright transition-all">
+                    {user.user_metadata?.avatar_url ? (
+                      <Image
+                        src={user.user_metadata.avatar_url}
+                        alt={profile?.full_name || "Profile"}
+                        width={40}
+                        height={40}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary-600 to-accent-600 flex items-center justify-center text-white font-bold text-lg">
+                        {(profile?.full_name || user.email || "U")
+                          .charAt(0)
+                          .toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg py-2 border border-gray-200 z-50">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-sm font-semibold text-gray-900">
+                        {profile?.full_name || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </p>
+                      {profile?.role === "admin" && (
+                        <span className="inline-block mt-2 px-2 py-1 bg-gradient-to-r from-primary-600 to-accent-600 text-white text-xs font-semibold rounded">
+                          Admin
+                        </span>
+                      )}
+                    </div>
+
+                    {profile?.role === "admin" ? (
+                      <>
+                        <Link
+                          href="/admin"
+                          onClick={() => setDropdownOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+                        >
+                          ⚙️ Dashboard Admin
+                        </Link>
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setDropdownOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+                        >
+                          👤 Dashboard Member
+                        </Link>
+                      </>
+                    ) : (
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 transition-colors"
+                      >
+                        📊 Dashboard Saya
+                      </Link>
+                    )}
+
+                    <div className="border-t border-gray-200 my-2"></div>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      🚪 Keluar
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <Link

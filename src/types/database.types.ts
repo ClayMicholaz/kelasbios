@@ -48,6 +48,7 @@ export interface Database {
           max_participants: number;
           class_date: string;
           class_time: string;
+          class_end_time: string | null;
           registration_deadline: string;
           materials: Json[] | null;
           practice_questions: Json | null;
@@ -65,6 +66,7 @@ export interface Database {
           max_participants: number;
           class_date: string;
           class_time: string;
+          class_end_time?: string | null;
           registration_deadline: string;
           materials?: Json[] | null;
           practice_questions?: Json | null;
@@ -82,6 +84,7 @@ export interface Database {
           max_participants?: number;
           class_date?: string;
           class_time?: string;
+          class_end_time?: string | null;
           registration_deadline?: string;
           materials?: Json[] | null;
           practice_questions?: Json | null;

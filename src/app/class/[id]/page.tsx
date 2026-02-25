@@ -85,7 +85,7 @@ export default async function ClassDetailPage({
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-linear-to-r from-indigo-600 to-purple-600 text-white px-8 py-12">
+          <div className="bg-gradient-to-r from-primary-700 via-primary-900 to-accent-600 text-white px-8 py-12">
             <div className="flex justify-between items-start mb-4">
               <h1 className="text-3xl md:text-4xl font-bold">
                 {classData.title}
@@ -106,7 +106,7 @@ export default async function ClassDetailPage({
                     : "Selesai"}
               </span>
             </div>
-            <p className="text-xl text-indigo-100">{classData.description}</p>
+            <p className="text-xl text-primary-100">{classData.description}</p>
           </div>
 
           {/* Content */}
@@ -307,7 +307,12 @@ export default async function ClassDetailPage({
                 ) : classData.status === "open" &&
                   !isDeadlinePassed &&
                   !isFull ? (
-                  <EnrollButton classId={classData.id} userId={user.id} />
+                  <EnrollButton
+                    classId={classData.id}
+                    userId={user.id}
+                    maxParticipants={classData.max_participants}
+                    currentEnrollments={enrollmentCount}
+                  />
                 ) : (
                   <button
                     disabled

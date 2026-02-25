@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PolicyCard from "@/components/PolicyCard";
+import PolicyModal from "@/components/PolicyModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
   title: "BIOS LMS - Learning Management System",
   description:
     "Platform pembelajaran eksklusif untuk mahasiswa Teknik Informatika UBM",
+  verification: {
+    google: "googleb19843a5ec79ff64.html",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +39,7 @@ export default function RootLayout({
         <main className="grow">{children}</main>
         <Footer />
         <PolicyCard />
+        <PolicyModal />
       </body>
     </html>
   );

@@ -65,9 +65,9 @@ export default async function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-gradient-to-r from-primary-700 via-primary-900 to-accent-600 text-white rounded-lg shadow-md p-6 mb-8">
           <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-indigo-100">
+          <p className="text-white/90">
             Kelola kelas, verifikasi pembayaran, dan pantau sistem
           </p>
         </div>
@@ -77,9 +77,9 @@ export default async function AdminDashboard() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-600">Total Kelas</p>
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-indigo-600"
+                  className="w-5 h-5 text-primary-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -123,7 +123,7 @@ export default async function AdminDashboard() {
             </p>
             <Link
               href="/admin/payments"
-              className="text-sm text-indigo-600 hover:text-indigo-700 mt-1 inline-block"
+              className="text-sm text-primary-600 hover:text-primary-700 mt-1 inline-block"
             >
               Lihat semua →
             </Link>
@@ -154,9 +154,9 @@ export default async function AdminDashboard() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-600">Total Enrolled</p>
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-accent-100 rounded-full flex items-center justify-center">
                 <svg
-                  className="w-5 h-5 text-purple-600"
+                  className="w-5 h-5 text-accent-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -180,12 +180,12 @@ export default async function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/admin/classes/create"
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-transparent hover:border-indigo-600"
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-transparent hover:border-primary-600"
           >
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mr-4">
                 <svg
-                  className="w-6 h-6 text-indigo-600"
+                  className="w-6 h-6 text-primary-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -207,7 +207,7 @@ export default async function AdminDashboard() {
 
           <Link
             href="/admin/payments"
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-transparent hover:border-indigo-600"
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-transparent hover:border-primary-600"
           >
             <div className="flex items-center">
               <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
@@ -238,7 +238,7 @@ export default async function AdminDashboard() {
 
           <Link
             href="/admin/classes"
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-transparent hover:border-indigo-600"
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-transparent hover:border-primary-600"
           >
             <div className="flex items-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
@@ -271,7 +271,7 @@ export default async function AdminDashboard() {
               <h2 className="text-xl font-bold text-gray-900">Kelas Terbaru</h2>
               <Link
                 href="/admin/classes"
-                className="text-sm text-indigo-600 hover:text-indigo-700"
+                className="text-sm text-primary-600 hover:text-primary-700"
               >
                 Lihat semua →
               </Link>
@@ -323,7 +323,7 @@ export default async function AdminDashboard() {
               </h2>
               <Link
                 href="/admin/payments"
-                className="text-sm text-indigo-600 hover:text-indigo-700"
+                className="text-sm text-primary-600 hover:text-primary-700"
               >
                 Lihat semua →
               </Link>
