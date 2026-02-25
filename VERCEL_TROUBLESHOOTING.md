@@ -3,6 +3,7 @@
 ## Langkah-langkah Memperbaiki Error
 
 ### 1. ✅ Sudah Diperbaiki
+
 - [x] Ubah nama file `src/proxy.ts` menjadi `src/middleware.ts`
 - [x] Ubah nama function dari `proxy` menjadi `middleware`
 - [x] Hapus trailing comma di `NEXT_PUBLIC_ADMIN_EMAILS`
@@ -26,7 +27,8 @@ NEXT_PUBLIC_BANK_ACCOUNT_NAME=Christoper Harris
 NEXT_PUBLIC_BANK_ACCOUNT_NUMBER=100271468145
 ```
 
-**PENTING:** 
+**PENTING:**
+
 - Ganti `NEXT_PUBLIC_APP_URL` dengan URL Vercel Anda yang sebenarnya
 - Jangan ada spasi setelah tanda sama dengan (=)
 - Jangan ada trailing comma di akhir email list
@@ -43,21 +45,28 @@ NEXT_PUBLIC_BANK_ACCOUNT_NUMBER=100271468145
 ### 4. Common Issues & Solutions
 
 #### Issue: "NEXT_PUBLIC_SUPABASE_URL is undefined"
+
 **Solution:** Environment variables belum ditambahkan atau salah scope (harus Production, Preview, Development)
 
 #### Issue: "Failed to fetch" atau "Network error"
-**Solution:** 
+
+**Solution:**
+
 - Cek apakah Supabase project masih aktif
 - Cek apakah URL dan ANON_KEY sudah benar
 - Cek di Supabase Dashboard → Settings → API apakah REST API enabled
 
 #### Issue: "Middleware error"
-**Solution:** 
+
+**Solution:**
+
 - Pastikan file `src/middleware.ts` ada (bukan `proxy.ts`)
 - Pastikan function export adalah `middleware` (bukan `proxy`)
 
 #### Issue: Error di RLS (Row Level Security)
-**Solution:** 
+
+**Solution:**
+
 - Pastikan RLS policies sudah disetup di Supabase
 - Jalankan semua migrations di folder `supabase/migrations/`
 
