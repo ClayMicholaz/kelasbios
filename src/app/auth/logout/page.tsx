@@ -9,10 +9,28 @@ export default function LogoutPage() {
 
   useEffect(() => {
     const handleLogout = async () => {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-      router.push("/");
-      router.refresh();
+      try {
+        const supabase = createClient();
+
+        // Clear localStorage
+        localStorage.removeItem("policy_accepted");
+        localStorage.removeItem("policy_checked_at");
+
+        // Sign out
+        await supabase.auth.signOut();
+
+        // Redirect
+        router.push("/");
+        router.refresh();
+
+        // Force full reload to ensure clean state
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 100);
+      } catch (error) {
+        console.error("Logout error:", error);
+        window.location.href = "/";
+      }
     };
 
     handleLogout();

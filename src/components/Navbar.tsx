@@ -204,9 +204,34 @@ export default function Navbar() {
   }, [user, profile]);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
+    try {
+      const supabase = createClient();
+
+      // Clear localStorage (including policy acceptance cache)
+      localStorage.removeItem("policy_accepted");
+      localStorage.removeItem("policy_checked_at");
+
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+
+      // Clear state
+      setUser(null);
+      setProfile(null);
+      setDropdownOpen(false);
+
+      // Redirect and refresh
+      router.push("/auth/login");
+      router.refresh();
+
+      // Force reload to ensure clean state
+      setTimeout(() => {
+        window.location.href = "/auth/login";
+      }, 100);
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force reload on error
+      window.location.href = "/auth/login";
+    }
   };
 
   const isActive = (path: string) => pathname === path;

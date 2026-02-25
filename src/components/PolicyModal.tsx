@@ -5,6 +5,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+// Cache key for localStorage
+const POLICY_CACHE_KEY = "policy_accepted";
+const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
 export default function PolicyModal() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -24,11 +28,36 @@ export default function PolicyModal() {
 
       const user = session?.user;
       if (!user) {
+        // Not logged in - no need to show policy modal
         setLoading(false);
         return;
       }
 
-      // Check if user has accepted policies
+      // Check localStorage cache first (FAST - no database query)
+      const cachedAcceptance = localStorage.getItem(POLICY_CACHE_KEY);
+      if (cachedAcceptance) {
+        try {
+          const cached = JSON.parse(cachedAcceptance);
+          const now = Date.now();
+
+          // If cache is valid and user matches, skip database query
+          if (
+            cached.userId === user.id &&
+            cached.accepted &&
+            now - cached.timestamp < CACHE_DURATION
+          ) {
+            console.log("[PolicyModal] Using cached acceptance");
+            setLoading(false);
+            return; // Don't show modal, cache is valid
+          }
+        } catch (e) {
+          console.error("[PolicyModal] Invalid cache:", e);
+          localStorage.removeItem(POLICY_CACHE_KEY);
+        }
+      }
+
+      // Cache miss or expired - check database (only on first login or cache expired)
+      console.log("[PolicyModal] Checking database for policy acceptance");
       const { data, error } = await supabase
         .from("policy_acceptance")
         .select("*")
@@ -39,12 +68,22 @@ export default function PolicyModal() {
         console.error("Error checking policy acceptance:", error);
       }
 
-      // Show modal if user hasn't accepted both policies
-      if (
-        !data ||
-        !data.privacy_policy_accepted ||
-        !data.terms_of_service_accepted
-      ) {
+      const hasAccepted =
+        data?.privacy_policy_accepted && data?.terms_of_service_accepted;
+
+      if (hasAccepted) {
+        // Save to cache so we don't query database again
+        localStorage.setItem(
+          POLICY_CACHE_KEY,
+          JSON.stringify({
+            userId: user.id,
+            accepted: true,
+            timestamp: Date.now(),
+          }),
+        );
+        console.log("[PolicyModal] Saved acceptance to cache");
+      } else {
+        // Show modal if user hasn't accepted
         setShowModal(true);
       }
 
@@ -66,7 +105,7 @@ export default function PolicyModal() {
       const user = session?.user;
       if (!user) return;
 
-      // Upsert policy acceptance
+      // Save to database
       const { error } = await supabase.from("policy_acceptance").upsert(
         {
           user_id: user.id,
@@ -83,6 +122,16 @@ export default function PolicyModal() {
         console.error("Error accepting policies:", error);
         alert("Terjadi kesalahan. Silakan coba lagi.");
       } else {
+        // Save to localStorage cache for fast future checks
+        localStorage.setItem(
+          POLICY_CACHE_KEY,
+          JSON.stringify({
+            userId: user.id,
+            accepted: true,
+            timestamp: Date.now(),
+          }),
+        );
+        console.log("[PolicyModal] Policy accepted and cached");
         setShowModal(false);
       }
     } catch (error) {

@@ -77,12 +77,13 @@ export default function AuthCallbackPage() {
         });
 
         console.log("Checking if profile exists in database...");
-        // Check if profile exists
+
+        // Check if profile exists - use maybeSingle() to avoid throwing on not found
         const { data: profile, error: profileFetchError } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
         console.log("Profile check result:");
         console.log("  - Profile data:", profile);
@@ -93,10 +94,7 @@ export default function AuthCallbackPage() {
         );
 
         // If profile doesn't exist, create one with auto-populated data
-        // Check for PGRST116 error code which means "not found"
-        const profileNotFound =
-          !profile ||
-          (profileFetchError && profileFetchError.code === "PGRST116");
+        const profileNotFound = !profile && !profileFetchError;
 
         if (profileNotFound && user.email) {
           console.log(
