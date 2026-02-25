@@ -3,10 +3,13 @@
 ## ✅ Perbaikan yang Sudah Dilakukan
 
 ### 1. **Tambah Force Refresh Profile Button**
+
 Klik foto profile → Ada button "🔄 Refresh Profile" untuk force fetch data terbaru dari database.
 
 ### 2. **Perbaiki Logout - Clear SEMUA Storage**
+
 Logout sekarang akan clear:
+
 - ✅ localStorage (semua keys)
 - ✅ sessionStorage (semua keys)
 - ✅ All cookies
@@ -15,6 +18,7 @@ Logout sekarang akan clear:
 - ✅ Force complete page reload dengan `window.location.replace()`
 
 ### 3. **Server Sudah Restart**
+
 Development server sudah restart dengan `.env` yang baru.
 
 ---
@@ -24,6 +28,7 @@ Development server sudah restart dengan `.env` yang baru.
 ### STEP 1: Clear Browser Data (PENTING!)
 
 **Opsi A - Quick Clear (Recommended):**
+
 ```
 1. Buka Incognito/Private Window
    - Chrome: Ctrl+Shift+N
@@ -35,6 +40,7 @@ Development server sudah restart dengan `.env` yang baru.
 ```
 
 **Opsi B - Complete Clear:**
+
 ```
 1. Tekan Ctrl+Shift+Delete
 2. Pilih:
@@ -55,6 +61,7 @@ Development server sudah restart dengan `.env` yang baru.
 ### STEP 3: Check Profile
 
 Klik foto profile di pojok kanan atas, seharusnya muncul:
+
 ```
 ✅ KWIK ANDREAS JONATHAN
 ✅ s32230111@student.ubm.ac.id
@@ -68,6 +75,7 @@ Klik foto profile di pojok kanan atas, seharusnya muncul:
 **Klik button "🔄 Refresh Profile"** - ini akan force fetch dari database.
 
 Console akan show:
+
 ```
 [Navbar] Force refreshing profile...
 [Navbar] Force refresh - New profile data: { role: "admin", nim: "32230111", ... }
@@ -98,23 +106,25 @@ Setelah refresh, data harus muncul.
 **Coba ini step-by-step:**
 
 1. **Manual Check di Console (F12):**
+
    ```javascript
    // Paste ini di console
-   const { createClient } = await import('/src/lib/supabase/client.ts');
+   const { createClient } = await import("/src/lib/supabase/client.ts");
    const supabase = createClient();
    const { data } = await supabase.auth.getSession();
-   console.log('User ID:', data.session?.user?.id);
-   
+   console.log("User ID:", data.session?.user?.id);
+
    // Lalu fetch profile
    const { data: profile } = await supabase
-     .from('profiles')
-     .select('*')
-     .eq('id', data.session?.user?.id)
+     .from("profiles")
+     .select("*")
+     .eq("id", data.session?.user?.id)
      .single();
-   console.log('Profile from DB:', profile);
+   console.log("Profile from DB:", profile);
    ```
-   
+
    **Expected Output:**
+
    ```javascript
    Profile from DB: {
      id: "...",
@@ -154,11 +164,12 @@ Setelah refresh, data harus muncul.
 Jika masih stuck:
 
 1. **Manual Logout di Console:**
+
    ```javascript
    // Paste di console
    localStorage.clear();
    sessionStorage.clear();
-   window.location.replace('/auth/login');
+   window.location.replace("/auth/login");
    ```
 
 2. **Force Close Tab:**
@@ -188,23 +199,27 @@ Setelah profile refresh dan role sudah "admin", tapi menu admin tidak muncul:
 Pastikan semuanya ✅:
 
 **Environment:**
+
 - [ ] `.env` file format benar (no spaces after commas)
 - [ ] Server sudah restart (`npm run dev`)
 - [ ] No error di terminal
 
 **Database:**
+
 - [ ] Profile exists di Supabase
 - [ ] `role = "admin"` (bukan null)
 - [ ] `nim = "32230111"` (bukan null)
 - [ ] Email match dengan yang login
 
 **Browser:**
+
 - [ ] Clear cache & cookies
 - [ ] Hard reload (Ctrl+Shift+R)
 - [ ] Console tidak ada error
 - [ ] Console menunjukkan profile logs
 
 **UI:**
+
 - [ ] Profile dropdown show correct data
 - [ ] Role & NIM tidak "not set"
 - [ ] Badge "Admin" muncul
@@ -216,6 +231,7 @@ Pastikan semuanya ✅:
 ## 🎯 Expected Behavior Setelah Fix
 
 ### Login Flow:
+
 ```
 1. Login dengan Google → Redirect ke /auth/callback
 2. Callback process → Check/create profile di database
@@ -225,6 +241,7 @@ Pastikan semuanya ✅:
 ```
 
 ### Profile Display:
+
 ```
 Dropdown Profile:
 ├─ 👤 KWIK ANDREAS JONATHAN
@@ -240,6 +257,7 @@ Dropdown Profile:
 ```
 
 ### Logout Flow:
+
 ```
 1. Click "🚪 Keluar"
 2. Clear localStorage, sessionStorage, cookies

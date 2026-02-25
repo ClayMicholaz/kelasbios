@@ -10,27 +10,31 @@ export default function LogoutPage() {
       try {
         const supabase = createClient();
 
-        console.log("[LogoutPage] Clearing localStorage...");
-        // Clear localStorage
-        localStorage.removeItem("policy_accepted");
-        localStorage.removeItem("policy_checked_at");
+        console.log("[LogoutPage] Clearing ALL storage...");
+        // Clear ALL localStorage and sessionStorage
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Clear specific cookies
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(
+              /=.*/,
+              "=;expires=" + new Date().toUTCString() + ";path=/",
+            );
+        });
 
         console.log("[LogoutPage] Signing out from Supabase...");
-        // Sign out
-        const { error } = await supabase.auth.signOut();
+        // Sign out from Supabase
+        await supabase.auth.signOut({ scope: "global" });
 
-        if (error) {
-          console.error("[LogoutPage] SignOut error:", error);
-          throw error;
-        }
-
-        console.log("[LogoutPage] Logout successful, redirecting to home...");
-        // Force full reload to ensure clean state
-        window.location.href = "/";
+        console.log("[LogoutPage] Logout successful, redirecting to login...");
       } catch (error) {
         console.error("[LogoutPage] Logout error:", error);
-        alert("Terjadi kesalahan saat logout. Halaman akan di-refresh.");
-        window.location.href = "/";
+      } finally {
+        // Force complete page reload (regardless of success/error)
+        window.location.replace("/auth/login");
       }
     };
 

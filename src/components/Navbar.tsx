@@ -204,12 +204,12 @@ export default function Navbar() {
     return () => clearTimeout(retryTimer);
   }, [user, profile]);
 
-const forceRefreshProfile = async () => {
+  const forceRefreshProfile = async () => {
     if (!user) return;
-    
+
     setRefreshing(true);
     console.log("[Navbar] Force refreshing profile...");
-    
+
     try {
       const supabase = createClient();
       const { data, error } = await supabase
@@ -217,7 +217,7 @@ const forceRefreshProfile = async () => {
         .select("*")
         .eq("id", user.id)
         .single();
-      
+
       if (error) {
         console.error("[Navbar] Force refresh error:", error);
       } else {
@@ -231,14 +231,24 @@ const forceRefreshProfile = async () => {
 
   const handleLogout = async () => {
     console.log("[Navbar] Logout button clicked");
+
+    // STEP 1: Clear UI state IMMEDIATELY (synchronous)
+    // This makes photo profile and dashboard access disappear instantly
+    console.log("[Navbar] Clearing UI state immediately...");
+    setUser(null);
+    setProfile(null);
+    setDropdownOpen(false);
+    setLoading(true); // Show loading state
+
+    // STEP 2: Clear storage and sign out (async, but UI already cleared)
     try {
       const supabase = createClient();
-      
+
       console.log("[Navbar] Clearing ALL storage...");
       // Clear ALL localStorage and sessionStorage
       localStorage.clear();
       sessionStorage.clear();
-      
+
       // Clear specific cookies
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
@@ -248,20 +258,12 @@ const forceRefreshProfile = async () => {
 
       console.log("[Navbar] Signing out from Supabase...");
       // Sign out from Supabase
-      await supabase.auth.signOut({ scope: 'global' });
-      
-      console.log("[Navbar] Clearing state...");
-      // Clear state
-      setUser(null);
-      setProfile(null);
-      setDropdownOpen(false);
-
-      console.log("[Navbar] Redirecting to login...");
-      // Force complete page reload to clear all state
-      window.location.replace("/auth/login");
+      await supabase.auth.signOut({ scope: "global" });
     } catch (error) {
       console.error("[Navbar] Logout error:", error);
-      // Force complete reload on error
+    } finally {
+      // STEP 3: Force complete page reload (regardless of success/error)
+      console.log("[Navbar] Forcing complete page reload...");
       window.location.replace("/auth/login");
     }
   };
@@ -386,7 +388,7 @@ const forceRefreshProfile = async () => {
                         Role: {profile?.role || "not set"} | NIM:{" "}
                         {profile?.nim || "not set"}
                       </p>
-                      
+
                       {/* Force Refresh Button */}
                       <button
                         onClick={(e) => {

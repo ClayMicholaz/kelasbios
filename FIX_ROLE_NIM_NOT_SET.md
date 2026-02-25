@@ -5,14 +5,16 @@
 ### 1. Format NEXT_PUBLIC_ADMIN_EMAILS Salah
 
 Di file `.env`, ada **SPASI setelah koma**:
+
 ```env
 # ❌ SALAH - Ada spasi setelah beberapa koma
 NEXT_PUBLIC_ADMIN_EMAILS=email1@student.ubm.ac.id,email2@student.ubm.ac.id, email3@student.ubm.ac.id
 ```
 
 Ini menyebabkan parsing email gagal, sehingga:
+
 - ✅ `email1@student.ubm.ac.id` → Detected (no space)
-- ✅ `email2@student.ubm.ac.id` → Detected (no space)  
+- ✅ `email2@student.ubm.ac.id` → Detected (no space)
 - ❌ ` email3@student.ubm.ac.id` → NOT detected (ada spasi di depan!)
 
 ### 2. Server Belum Restart Setelah Edit .env
@@ -26,12 +28,14 @@ Environment variables hanya dibaca saat server start. Jika Anda edit `.env` tapi
 ### STEP 1: Fix File .env
 
 File sudah diperbaiki otomatis. Format yang benar:
+
 ```env
 # ✅ BENAR - Tidak ada spasi, semua dalam satu baris
 NEXT_PUBLIC_ADMIN_EMAILS=s32230111@student.ubm.ac.id,s32240127@student.ubm.ac.id,s32230123@student.ubm.ac.id,s32230130@student.ubm.ac.id,s32240207@student.ubm.ac.id,s32230099@student.ubm.ac.id
 ```
 
 **Poin Penting:**
+
 - ✅ Tidak ada spasi setelah koma
 - ✅ Tidak ada line break (semua dalam 1 baris)
 - ✅ Tidak ada trailing koma di akhir
@@ -104,6 +108,7 @@ Jika masih `role: null` atau `nim: null`, lanjut ke Step 4.
 ### B. Check Profiles Data
 
 Query akan menampilkan:
+
 - ✅ Semua profiles yang ada
 - ❌ Profiles dengan role/nim NULL
 - 📊 Count profiles by role
@@ -114,8 +119,8 @@ Jika profile Anda tidak ada atau datanya NULL, update manual:
 
 ```sql
 -- Ganti dengan email dan data Anda
-UPDATE profiles 
-SET 
+UPDATE profiles
+SET
   role = 'admin',
   nim = '32230111',
   full_name = 'Your Full Name'
@@ -132,15 +137,14 @@ Setiap kali user mengakses halaman, middleware akan:
 
 ```typescript
 // 1. Get admin emails from env
-const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",").map(email => email.trim());
+const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",").map(
+  (email) => email.trim(),
+);
 
 // 2. Check if user email is in admin list
 if (adminEmails.includes(user.email)) {
   // 3. Update profile role to admin
-  await supabase
-    .from("profiles")
-    .update({ role: "admin" })
-    .eq("id", user.id);
+  await supabase.from("profiles").update({ role: "admin" }).eq("id", user.id);
 }
 ```
 
@@ -153,8 +157,8 @@ Saat pertama kali login dengan Google:
 ```typescript
 // 1. Extract NIM from email
 const emailPrefix = user.email.split("@")[0]; // "s32230111"
-const nimMatch = emailPrefix.match(/\d{8}/);  // Find 8 digits
-const nim = nimMatch ? nimMatch[0] : "";      // "32230111"
+const nimMatch = emailPrefix.match(/\d{8}/); // Find 8 digits
+const nim = nimMatch ? nimMatch[0] : ""; // "32230111"
 
 // 2. Check if email is admin
 const isAdmin = adminEmails.includes(user.email);
@@ -165,7 +169,7 @@ await supabase.from("profiles").insert({
   email: user.email,
   full_name: user.user_metadata.full_name,
   nim: nim,
-  role: isAdmin ? "admin" : "member"
+  role: isAdmin ? "admin" : "member",
 });
 ```
 
