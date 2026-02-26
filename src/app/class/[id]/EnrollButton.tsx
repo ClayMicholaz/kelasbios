@@ -35,6 +35,18 @@ export default function EnrollButton({
     try {
       const supabase = createClient();
 
+      // Verify user session before enrollment
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error(
+          "Sesi Anda telah berakhir. Silakan login kembali untuk melanjutkan.",
+        );
+      }
+
       // Check current enrollment count to prevent race condition
       const { data: enrollments, error: countError } = await supabase
         .from("enrollments")

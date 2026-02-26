@@ -187,7 +187,7 @@ export default function PaymentUpload({
           <div className="text-sm text-primary-900 space-y-1">
             <p>
               <strong>Bank:</strong>{" "}
-              {process.env.NEXT_PUBLIC_BANK_NAME || "BCA"}
+              {process.env.NEXT_PUBLIC_BANK_NAME || "JAGO"}
             </p>
             <p>
               <strong>No. Rekening:</strong>{" "}

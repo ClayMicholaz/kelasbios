@@ -38,7 +38,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Check if user email ends with allowed domain
-  if (user && !user.email?.endsWith("@student.ubm.ac.id")) {
+  // Only check on initial auth, not on every request to prevent interrupting user during form filling
+  if (
+    user &&
+    !user.email?.endsWith("@student.ubm.ac.id") &&
+    request.nextUrl.pathname.startsWith("/auth/callback")
+  ) {
     await supabase.auth.signOut();
     const url = request.nextUrl.clone();
     url.pathname = "/auth/error";

@@ -30,27 +30,26 @@ export default async function AdminClassesPage() {
   // Get all classes
   const { data: classes } = await supabase
     .from("classes")
-    .select(
-      `
-      *,
-      enrollments(payment_status)
-    `,
-    )
+    .select("*")
     .order("class_date", { ascending: false });
 
-  // Calculate enrollment count for each class
-  const classesWithCount =
-    classes?.map((classItem) => {
-      const enrollmentCount =
-        classItem.enrollments?.filter(
-          (e: any) => e.payment_status === "verified",
-        ).length || 0;
+  // Calculate enrollment count for each class using direct count query
+  // This ensures consistency with user-facing enrollment counts
+  const classesWithCount = [];
+  if (classes) {
+    for (const classItem of classes) {
+      const { data: verifiedEnrollments } = await supabase
+        .from("enrollments")
+        .select("id")
+        .eq("class_id", classItem.id)
+        .eq("payment_status", "verified");
 
-      return {
+      classesWithCount.push({
         ...classItem,
-        enrollment_count: enrollmentCount,
-      };
-    }) || [];
+        enrollment_count: verifiedEnrollments?.length || 0,
+      });
+    }
+  }
 
   const openClasses = classesWithCount.filter((c) => c.status === "open");
   const closedClasses = classesWithCount.filter((c) => c.status === "closed");
