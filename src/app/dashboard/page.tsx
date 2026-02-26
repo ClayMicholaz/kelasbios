@@ -169,13 +169,13 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Kelas Aktif</p>
-                <p className="text-3xl font-bold text-indigo-600">
+                <p className="text-3xl font-bold text-primary-600">
                   {verifiedClasses.length}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 text-indigo-600"
+                  className="w-6 h-6 text-primary-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -274,7 +274,7 @@ export default async function DashboardPage() {
                           <span className="font-semibold">Ruangan:</span>{" "}
                           {(enrollment.classes as any)?.classroom}
                         </p>
-                        <p className="text-lg font-bold text-indigo-600 mt-2">
+                        <p className="text-lg font-bold text-primary-600 mt-2">
                           {formatCurrency(10000)}
                         </p>
                       </div>
@@ -317,7 +317,7 @@ export default async function DashboardPage() {
                           •{" "}
                           {formatTime((enrollment.classes as any)?.class_time)}
                         </p>
-                        <p className="text-lg font-bold text-indigo-600 mt-2">
+                        <p className="text-lg font-bold text-primary-600 mt-2">
                           {formatCurrency(10000)}
                         </p>
                       </div>
@@ -420,7 +420,7 @@ export default async function DashboardPage() {
 
                     <Link
                       href={`/class/${(enrollment.classes as any)?.id}/materials`}
-                      className="mt-4 block w-full px-4 py-2 bg-indigo-600 text-white text-center rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                      className="mt-4 block w-full px-4 py-2 bg-primary-600 text-white text-center rounded-lg hover:bg-primary-700 transition-colors font-medium"
                     >
                       Lihat Materi & Latihan
                     </Link>

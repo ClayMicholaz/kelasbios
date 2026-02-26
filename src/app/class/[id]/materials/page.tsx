@@ -67,7 +67,7 @@ export default async function ClassMaterialsPage({
             </p>
             <Link
               href="/dashboard"
-              className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               Kembali ke Dashboard
             </Link>
@@ -92,7 +92,7 @@ export default async function ClassMaterialsPage({
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-indigo-600 hover:text-indigo-700 mb-6"
+          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
         >
           <svg
             className="w-5 h-5 mr-2"
@@ -168,7 +168,7 @@ export default async function ClassMaterialsPage({
                     ) : (
                       <>
                         <svg
-                          className="w-8 h-8 text-indigo-500 mr-3"
+                          className="w-8 h-8 text-primary-500 mr-3"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -195,7 +195,7 @@ export default async function ClassMaterialsPage({
                       target="_blank"
                       rel="noopener noreferrer"
                       download
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
                     >
                       Download
                     </a>

@@ -59,11 +59,11 @@ export default function PracticeQuiz({ questions }: PracticeQuizProps) {
 
     return (
       <div className="space-y-6">
-        <div className="text-center bg-indigo-50 rounded-lg p-8">
+        <div className="text-center bg-primary-50 rounded-lg p-8">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
             Hasil Latihan
           </h3>
-          <div className="text-6xl font-bold text-indigo-600 mb-2">
+          <div className="text-6xl font-bold text-primary-600 mb-2">
             {score}/{questions.length}
           </div>
           <p className="text-xl text-gray-700 mb-4">
@@ -136,7 +136,7 @@ export default function PracticeQuiz({ questions }: PracticeQuizProps) {
 
         <button
           onClick={handleReset}
-          className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+          className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
         >
           Ulangi Latihan
         </button>
@@ -160,7 +160,7 @@ export default function PracticeQuiz({ questions }: PracticeQuizProps) {
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+            className="bg-primary-600 h-2 rounded-full transition-all duration-300"
             style={{
               width: `${((currentQuestion + 1) / questions.length) * 100}%`,
             }}
@@ -181,8 +181,8 @@ export default function PracticeQuiz({ questions }: PracticeQuizProps) {
               onClick={() => handleAnswerSelect(option)}
               className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
                 selectedAnswers[currentQuestion] === option
-                  ? "border-indigo-500 bg-indigo-50"
-                  : "border-gray-200 hover:border-indigo-300 bg-white"
+                  ? "border-primary-500 bg-primary-50"
+                  : "border-gray-200 hover:border-primary-300 bg-white"
               }`}
             >
               <span className="font-medium">{option}</span>
@@ -212,7 +212,7 @@ export default function PracticeQuiz({ questions }: PracticeQuizProps) {
         ) : (
           <button
             onClick={handleNext}
-            className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+            className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
           >
             Selanjutnya →
           </button>
@@ -227,9 +227,9 @@ export default function PracticeQuiz({ questions }: PracticeQuizProps) {
             onClick={() => setCurrentQuestion(index)}
             className={`w-10 h-10 rounded-lg font-medium transition-colors ${
               selectedAnswers[index]
-                ? "bg-indigo-600 text-white"
+                ? "bg-primary-600 text-white"
                 : index === currentQuestion
-                  ? "bg-indigo-100 text-indigo-700 border-2 border-indigo-600"
+                  ? "bg-primary-100 text-primary-700 border-2 border-primary-600"
                   : "bg-gray-200 text-gray-600 hover:bg-gray-300"
             }`}
           >

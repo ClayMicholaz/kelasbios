@@ -23,15 +23,18 @@ export default function PaymentUpload({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setError("Hanya file gambar yang diperbolehkan");
+      // Validate file type - only allow specific image formats
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      if (!allowedTypes.includes(file.type)) {
+        setError("Format file tidak didukung. Gunakan JPEG, PNG, atau WebP");
         return;
       }
 
       // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setError("Ukuran file maksimal 5MB");
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        setError(`Ukuran file terlalu besar (${fileSizeMB}MB). Maksimal 5MB`);
         return;
       }
 
@@ -68,16 +71,19 @@ export default function PaymentUpload({
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("payment-proofs").getPublicUrl(fileName);
+      // Get signed URL for private bucket (valid for 10 years)
+      const { data: signedUrlData, error: urlError } = await supabase.storage
+        .from("payment-proofs")
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365 * 10); // 10 years
+
+      if (urlError) throw urlError;
+      if (!signedUrlData?.signedUrl) throw new Error("Failed to get signed URL");
 
       // Update enrollment with payment proof
       const { error: updateError } = await supabase
         .from("enrollments")
         .update({
-          payment_proof: publicUrl,
+          payment_proof: signedUrlData.signedUrl,
           payment_date: new Date().toISOString(),
           payment_status: "pending", // Reset to pending if reupload
         })
@@ -91,6 +97,7 @@ export default function PaymentUpload({
 
       alert("Bukti pembayaran berhasil diunggah! Menunggu verifikasi admin.");
     } catch (err: any) {
+      console.error("Upload error:", err);
       setError(err.message || "Terjadi kesalahan saat mengunggah");
     } finally {
       setUploading(false);
@@ -114,7 +121,7 @@ export default function PaymentUpload({
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-full md:w-auto px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full md:w-auto px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {uploading
             ? "Mengunggah..."
@@ -123,11 +130,11 @@ export default function PaymentUpload({
               : "Upload Bukti Pembayaran"}
         </button>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-          <p className="text-sm font-semibold text-blue-900 mb-2">
+        <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 mt-4">
+          <p className="text-sm font-semibold text-primary-900 mb-2">
             Informasi Pembayaran:
           </p>
-          <div className="text-sm text-blue-800 space-y-1">
+          <div className="text-sm text-primary-800 space-y-1">
             <p>
               <strong>Bank:</strong>{" "}
               {process.env.NEXT_PUBLIC_BANK_NAME || "BCA"}
@@ -144,8 +151,11 @@ export default function PaymentUpload({
               <strong>Jumlah:</strong> Rp 10.000
             </p>
           </div>
-          <p className="text-xs text-blue-600 mt-2">
-            * Upload bukti transfer setelah melakukan pembayaran
+          <p className="text-xs text-primary-700 mt-3 pt-2 border-t border-primary-200">
+            <strong>Limitasi Upload:</strong><br/>
+            • Format: JPEG, PNG, atau WebP<br/>
+            • Ukuran maksimal: 5MB<br/>
+            • Pastikan bukti transfer jelas dan dapat dibaca
           </p>
         </div>
       </div>
@@ -190,7 +200,7 @@ export default function PaymentUpload({
               <button
                 onClick={handleUpload}
                 disabled={uploading}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {uploading ? "Mengunggah..." : "Upload"}
               </button>

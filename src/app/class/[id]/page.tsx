@@ -66,7 +66,7 @@ export default async function ClassDetailPage({
         {/* Back button */}
         <Link
           href="/"
-          className="inline-flex items-center text-indigo-600 hover:text-indigo-700 mb-6"
+          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
         >
           <svg
             className="w-5 h-5 mr-2"
@@ -120,7 +120,7 @@ export default async function ClassDetailPage({
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 mr-3 text-indigo-600 mt-0.5"
+                    className="w-6 h-6 mr-3 text-primary-600 mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -147,7 +147,7 @@ export default async function ClassDetailPage({
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 mr-3 text-indigo-600 mt-0.5"
+                    className="w-6 h-6 mr-3 text-primary-600 mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -169,7 +169,7 @@ export default async function ClassDetailPage({
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 mr-3 text-indigo-600 mt-0.5"
+                    className="w-6 h-6 mr-3 text-primary-600 mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -189,7 +189,7 @@ export default async function ClassDetailPage({
 
                 <div className="flex items-start">
                   <svg
-                    className="w-6 h-6 mr-3 text-indigo-600 mt-0.5"
+                    className="w-6 h-6 mr-3 text-primary-600 mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -213,19 +213,19 @@ export default async function ClassDetailPage({
                 </div>
               </div>
 
-              <div className="bg-indigo-50 p-6 rounded-lg">
+              <div className="bg-primary-50 p-6 rounded-lg">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   Informasi Pendaftaran
                 </h2>
 
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 mb-2">Biaya kelas:</p>
-                  <p className="text-3xl font-bold text-indigo-600">
+                  <p className="text-3xl font-bold text-primary-600">
                     {formatCurrency(10000)}
                   </p>
                 </div>
 
-                <div className="mb-4 bg-white p-4 rounded-lg border border-indigo-200">
+                <div className="mb-4 bg-white p-4 rounded-lg border border-primary-200">
                   <p className="text-sm font-semibold text-gray-900 mb-2">
                     Detail Transfer:
                   </p>
@@ -266,7 +266,7 @@ export default async function ClassDetailPage({
                 {!user ? (
                   <Link
                     href="/auth/login"
-                    className="block w-full text-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                    className="block w-full text-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
                   >
                     Login untuk Mendaftar
                   </Link>
@@ -300,7 +300,7 @@ export default async function ClassDetailPage({
                     </div>
                     <Link
                       href="/dashboard"
-                      className="block w-full text-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                      className="block w-full text-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
                     >
                       Lihat Dashboard
                     </Link>
