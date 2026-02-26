@@ -77,7 +77,9 @@ export default async function Home() {
                   href="/auth/login"
                   className="px-6 md:px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-base md:text-lg"
                 >
-                  <span className="hidden sm:inline">Masuk dengan Google UBM</span>
+                  <span className="hidden sm:inline">
+                    Masuk dengan Google UBM
+                  </span>
                   <span className="sm:hidden">Masuk Google UBM</span>
                 </Link>
               ) : (

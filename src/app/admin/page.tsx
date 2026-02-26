@@ -349,6 +349,9 @@ export default async function AdminDashboard() {
                           <p className="text-xs text-gray-600 mt-1">
                             {new Date(enrollment.created_at).toLocaleDateString(
                               "id-ID",
+                              {
+                                timeZone: "Asia/Jakarta",
+                              },
                             )}
                           </p>
                         </div>

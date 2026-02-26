@@ -131,8 +131,8 @@ export default function CreateClassPage() {
       if (deadline >= classDateTime) {
         throw new Error(
           "Batas pendaftaran harus sebelum waktu mulai kelas. " +
-            `Deadline: ${deadline.toLocaleString("id-ID")}, ` +
-            `Kelas: ${classDateTime.toLocaleString("id-ID")}`,
+            `Deadline: ${deadline.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}, ` +
+            `Kelas: ${classDateTime.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`,
         );
       }
 

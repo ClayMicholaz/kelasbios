@@ -141,23 +141,27 @@ export default async function AdminClassDetailPage({
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Terdaftar</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              Total Terdaftar
+            </p>
             <p className="text-3xl font-bold text-primary-600">
               {verifiedEnrollments.length}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Hadir</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">Hadir</p>
             <p className="text-3xl font-bold text-green-600">{attendedCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Belum Hadir</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              Belum Hadir
+            </p>
             <p className="text-3xl font-bold text-orange-600">
               {verifiedEnrollments.length - attendedCount}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Pending</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">Pending</p>
             <p className="text-3xl font-bold text-yellow-600">
               {pendingEnrollments.length}
             </p>
@@ -175,22 +179,22 @@ export default async function AdminClassDetailPage({
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       No
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Nama
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Status Pembayaran
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Kehadiran
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                       Aksi
                     </th>
                   </tr>
@@ -228,10 +232,12 @@ export default async function AdminClassDetailPage({
                               ✓ Hadir
                             </span>
                             {enrollment.attended_at && (
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs text-gray-600 mt-1 font-medium">
                                 {new Date(
                                   enrollment.attended_at,
-                                ).toLocaleString("id-ID")}
+                                ).toLocaleString("id-ID", {
+                                  timeZone: "Asia/Jakarta",
+                                })}
                               </p>
                             )}
                           </div>

@@ -14,11 +14,10 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: string): string {
-  // Convert to WIB (UTC+7)
-  const utcDate = new Date(date);
-  const wibDate = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000);
+  // Use Asia/Jakarta timezone directly (WIB = UTC+7)
+  const dateObj = new Date(date);
 
-  return wibDate.toLocaleDateString("id-ID", {
+  return dateObj.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -27,11 +26,10 @@ export function formatDate(date: string): string {
 }
 
 export function formatDateTime(date: string): string {
-  // Convert to WIB (UTC+7)
-  const utcDate = new Date(date);
-  const wibDate = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000);
+  // Use Asia/Jakarta timezone directly (WIB = UTC+7)
+  const dateObj = new Date(date);
 
-  return wibDate.toLocaleString("id-ID", {
+  return dateObj.toLocaleString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",

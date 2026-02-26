@@ -108,19 +108,25 @@ export default async function AdminPaymentsPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Menunggu Verifikasi</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              Menunggu Verifikasi
+            </p>
             <p className="text-3xl font-bold text-yellow-600">
               {pendingEnrollments?.length || 0}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Terverifikasi</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              Terverifikasi
+            </p>
             <p className="text-3xl font-bold text-green-600">
               {verifiedEnrollments?.length || 0}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Pemasukan</p>
+            <p className="text-sm font-semibold text-gray-700 mb-1">
+              Total Pemasukan
+            </p>
             <p className="text-2xl font-bold text-primary-600">
               {formatCurrency((verifiedEnrollments?.length || 0) * 10000)}
             </p>
@@ -146,13 +152,13 @@ export default async function AdminPaymentsPage() {
                         Informasi Peserta
                       </h3>
                       <div className="space-y-1 text-sm">
-                        <p className="font-semibold text-primary-600">
+                        <p className="font-semibold text-primary-700">
                           {(enrollment.profiles as any)?.full_name}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-gray-700">
                           {(enrollment.profiles as any)?.email}
                         </p>
-                        <p className="text-gray-500 text-xs">
+                        <p className="text-gray-600 text-xs font-medium">
                           Daftar: {formatDateTime(enrollment.created_at)}
                         </p>
                       </div>
@@ -164,15 +170,15 @@ export default async function AdminPaymentsPage() {
                         Informasi Kelas
                       </h3>
                       <div className="space-y-1 text-sm">
-                        <p className="font-semibold">
+                        <p className="font-semibold text-gray-900">
                           {(enrollment.classes as any)?.title}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-gray-700">
                           {formatDate((enrollment.classes as any)?.class_date)}{" "}
                           •{" "}
                           {formatTime((enrollment.classes as any)?.class_time)}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-gray-700">
                           Ruangan: {(enrollment.classes as any)?.classroom}
                         </p>
                         <p className="font-bold text-primary-600 mt-2">
@@ -213,7 +219,7 @@ export default async function AdminPaymentsPage() {
                           />
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-500 italic">
+                        <p className="text-sm text-gray-600 font-medium italic">
                           Belum ada bukti pembayaran
                         </p>
                       )}
@@ -256,16 +262,16 @@ export default async function AdminPaymentsPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                         Peserta
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                         Kelas
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                         Jumlah
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                         Diverifikasi
                       </th>
                     </tr>
@@ -277,15 +283,15 @@ export default async function AdminPaymentsPage() {
                           <div className="text-sm font-medium text-gray-900">
                             {(enrollment.profiles as any)?.full_name}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-600">
                             {(enrollment.profiles as any)?.email}
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm font-medium text-gray-900">
                             {(enrollment.classes as any)?.title}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-600">
                             {formatDate(
                               (enrollment.classes as any)?.class_date,
                             )}
