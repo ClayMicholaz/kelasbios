@@ -5,11 +5,11 @@ import {
   formatTime,
   formatCurrency,
   getDaysRemaining,
-  getCountdownText,
   isUUID,
 } from "@/lib/utils";
 import Link from "next/link";
 import EnrollButton from "./EnrollButton";
+import CountdownTimer from "@/components/CountdownTimer";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -371,9 +371,10 @@ export default async function ClassDetailPage({
                       {formatDate(classData.registration_deadline)}
                     </p>
                     {!isDeadlinePassed && (
-                      <p className="text-sm text-orange-600 mt-1">
-                        {getCountdownText(classData.registration_deadline)}
-                      </p>
+                      <CountdownTimer 
+                        deadline={classData.registration_deadline}
+                        className="text-sm text-orange-600 mt-1 block"
+                      />
                     )}
                   </div>
 

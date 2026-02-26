@@ -46,9 +46,19 @@ export function formatTime(time: string): string {
 }
 
 export function getDaysRemaining(deadline: string): number {
+  // Get current time in WIB (Asia/Jakarta) timezone
   const now = new Date();
+  const nowWIB = new Date(
+    now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
+  );
+
+  // Parse deadline and ensure it's in WIB timezone
   const deadlineDate = new Date(deadline);
-  const diff = deadlineDate.getTime() - now.getTime();
+  const deadlineWIB = new Date(
+    deadlineDate.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
+  );
+
+  const diff = deadlineWIB.getTime() - nowWIB.getTime();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
@@ -58,9 +68,19 @@ export function getTimeRemaining(deadline: string): {
   minutes: number;
   seconds: number;
 } {
+  // Get current time in WIB (Asia/Jakarta) timezone
   const now = new Date();
+  const nowWIB = new Date(
+    now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
+  );
+
+  // Parse deadline and ensure it's in WIB timezone
   const deadlineDate = new Date(deadline);
-  const diff = deadlineDate.getTime() - now.getTime();
+  const deadlineWIB = new Date(
+    deadlineDate.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }),
+  );
+
+  const diff = deadlineWIB.getTime() - nowWIB.getTime();
 
   if (diff <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -95,18 +115,23 @@ export function isUUID(str: string): boolean {
 
 export function getCountdownText(deadline: string): string {
   const timeRemaining = getTimeRemaining(deadline);
-  
-  if (timeRemaining.days === 0 && timeRemaining.hours === 0 && timeRemaining.minutes === 0 && timeRemaining.seconds === 0) {
+
+  if (
+    timeRemaining.days === 0 &&
+    timeRemaining.hours === 0 &&
+    timeRemaining.minutes === 0 &&
+    timeRemaining.seconds === 0
+  ) {
     return "Sudah ditutup";
   }
-  
+
   if (timeRemaining.days > 0) {
     return `Tutup dalam ${timeRemaining.days} hari`;
   }
-  
+
   if (timeRemaining.hours > 0) {
     return `Tutup dalam ${timeRemaining.hours} jam`;
   }
-  
+
   return "Tutup hari ini";
 }

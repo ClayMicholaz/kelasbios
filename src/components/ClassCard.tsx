@@ -4,9 +4,9 @@ import {
   formatTime,
   formatCurrency,
   getDaysRemaining,
-  getCountdownText,
 } from "@/lib/utils";
 import Link from "next/link";
+import CountdownTimer from "./CountdownTimer";
 
 interface ClassCardProps {
   classData: Class & { enrollment_count?: number };
@@ -145,9 +145,10 @@ export default function ClassCard({
               {formatCurrency(10000)}
             </p>
             {!isDeadlinePassed && (
-              <p className="text-xs text-gray-500">
-                {getCountdownText(classData.registration_deadline)}
-              </p>
+              <CountdownTimer 
+                deadline={classData.registration_deadline}
+                className="text-xs text-gray-500"
+              />
             )}
           </div>
 
