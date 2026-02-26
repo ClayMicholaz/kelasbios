@@ -14,8 +14,9 @@ export const dynamic = "force-dynamic";
 export default async function ClassDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,7 +26,7 @@ export default async function ClassDetailPage({
   const { data: classData, error } = await supabase
     .from("classes")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !classData) {
@@ -36,7 +37,7 @@ export default async function ClassDetailPage({
   const { data: enrollments } = await supabase
     .from("enrollments")
     .select("id, payment_status")
-    .eq("class_id", params.id)
+    .eq("class_id", id)
     .eq("payment_status", "verified");
 
   const enrollmentCount = enrollments?.length || 0;
@@ -48,7 +49,7 @@ export default async function ClassDetailPage({
     const { data } = await supabase
       .from("enrollments")
       .select("*")
-      .eq("class_id", params.id)
+      .eq("class_id", id)
       .eq("user_id", user.id)
       .single();
 

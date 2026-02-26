@@ -4,7 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PolicyCard from "@/components/PolicyCard";
-import PolicyModal from "@/components/PolicyModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -123,7 +122,6 @@ export default function RootLayout({
         <main className="grow">{children}</main>
         <Footer />
         <PolicyCard />
-        <PolicyModal />
       </body>
     </html>
   );

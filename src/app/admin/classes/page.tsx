@@ -33,7 +33,7 @@ export default async function AdminClassesPage() {
     .select(
       `
       *,
-      enrollments!inner(payment_status)
+      enrollments(payment_status)
     `,
     )
     .order("class_date", { ascending: false });

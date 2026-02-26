@@ -9,8 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function AdminClassDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,7 +36,7 @@ export default async function AdminClassDetailPage({
   const { data: classData, error } = await supabase
     .from("classes")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !classData) {
@@ -51,7 +52,7 @@ export default async function AdminClassDetailPage({
       profiles:user_id(full_name, email)
     `,
     )
-    .eq("class_id", params.id)
+    .eq("class_id", id)
     .order("created_at", { ascending: true });
 
   const verifiedEnrollments =

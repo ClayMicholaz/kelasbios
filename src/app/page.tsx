@@ -19,7 +19,7 @@ export default async function Home() {
     .select(
       `
       *,
-      enrollments!inner(payment_status)
+      enrollments(payment_status)
     `,
     )
     .eq("status", "open")

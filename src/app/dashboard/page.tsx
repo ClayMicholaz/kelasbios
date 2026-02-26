@@ -17,11 +17,13 @@ export default async function DashboardPage() {
   }
 
   // Get user profile
-  const { data: profile, error: profileError } = await supabase
+  const { data: profileData, error: profileError } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
+
+  let profile = profileData;
 
   console.log("Dashboard - Profile check:", {
     profile,
@@ -35,22 +37,26 @@ export default async function DashboardPage() {
 
   if (profileNotFound && user.email) {
     console.log("Dashboard - Creating profile for:", user.email);
+
+    // Extract NIM from email (8 digits)
     const emailPrefix = user.email.split("@")[0];
     const nimMatch = emailPrefix.match(/\d{8}/);
     const nim = nimMatch ? nimMatch[0] : "";
 
+    // Get full_name from user metadata (Google OAuth provides this)
     const fullName =
       user.user_metadata?.full_name ||
       user.user_metadata?.name ||
       user.email?.split("@")[0] ||
       "User";
 
-    const adminEmails =
-      process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",").map((email) =>
-        email.trim(),
-      ) || [];
-    const isAdmin = adminEmails.includes(user.email);
+    console.log("Dashboard - Inserting profile:", {
+      full_name: fullName,
+      nim: nim,
+      email: user.email,
+    });
 
+    // Default role is 'member', admin role harus diset manual via SQL
     const { data: insertData, error: insertError } = await supabase
       .from("profiles")
       .insert({
@@ -58,7 +64,7 @@ export default async function DashboardPage() {
         email: user.email,
         full_name: fullName,
         nim: nim,
-        role: isAdmin ? "admin" : "member",
+        role: "member", // Always create as member, admin diset manual
       })
       .select()
       .single();
@@ -70,34 +76,50 @@ export default async function DashboardPage() {
 
     if (insertError) {
       console.error("Dashboard - Failed to create profile:", insertError);
+      // Continue even if insert fails - might be race condition
+    } else {
+      // Use the newly inserted profile
+      profile = insertData;
     }
+  }
 
-    // Re-fetch profile
-    const { data: newProfile } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+  // If profile exists but missing data, update it
+  if (profile && user.user_metadata) {
+    const needsUpdate =
+      !profile.full_name || profile.full_name === "User" || !profile.nim;
 
-    if (newProfile) {
-      return (
-        <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Dashboard Saya
-              </h1>
-              <p className="text-gray-600">
-                Selamat datang,{" "}
-                <span className="font-semibold">{newProfile.full_name}</span>!
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                Profil Anda telah dibuat. Silakan refresh halaman.
-              </p>
-            </div>
-          </div>
-        </div>
-      );
+    if (needsUpdate) {
+      console.log("Dashboard - Updating incomplete profile");
+
+      const emailPrefix = user.email!.split("@")[0];
+      const nimMatch = emailPrefix.match(/\d{8}/);
+      const nim = nimMatch ? nimMatch[0] : profile.nim || "";
+
+      const fullName =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        profile.full_name ||
+        user.email?.split("@")[0] ||
+        "User";
+
+      await supabase
+        .from("profiles")
+        .update({
+          full_name: fullName,
+          nim: nim,
+        })
+        .eq("id", user.id);
+
+      // Re-fetch updated profile
+      const { data: updatedProfile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (updatedProfile) {
+        profile = updatedProfile;
+      }
     }
   }
 

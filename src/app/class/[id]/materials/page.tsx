@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic";
 export default async function ClassMaterialsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,7 +24,7 @@ export default async function ClassMaterialsPage({
   const { data: classData, error } = await supabase
     .from("classes")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error || !classData) {
@@ -34,7 +35,7 @@ export default async function ClassMaterialsPage({
   const { data: enrollment } = await supabase
     .from("enrollments")
     .select("*")
-    .eq("class_id", params.id)
+    .eq("class_id", id)
     .eq("user_id", user.id)
     .eq("payment_status", "verified")
     .single();

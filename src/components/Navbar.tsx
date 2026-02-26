@@ -2,130 +2,17 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import { User } from "@supabase/supabase-js";
-import { Profile } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, profile, loading, isAdmin, signOut, refreshProfile } =
+    useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const supabase = createClient();
-
-    const getUser = async () => {
-      console.log("[Navbar] Starting to fetch user...");
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        console.log("[Navbar] Session:", session?.user?.email || "No session");
-
-        if (!isMounted) return;
-
-        const user = session?.user ?? null;
-        setUser(user);
-
-        if (user) {
-          console.log("[Navbar] Fetching profile for:", user.id);
-          const { data: profileData, error: profileError } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
-
-          console.log("[Navbar] Profile data:", profileData);
-          console.log("[Navbar] Profile error:", profileError);
-
-          if (isMounted) {
-            setProfile(profileData);
-          }
-        } else {
-          // Clear profile if no user
-          console.log("[Navbar] No user, clearing profile");
-          if (isMounted) {
-            setProfile(null);
-          }
-        }
-      } catch (error) {
-        console.error("[Navbar] Error loading user:", error);
-      } finally {
-        if (isMounted) {
-          console.log(
-            "[Navbar] Setting loading to false, user:",
-            user?.email || "No user",
-          );
-          setLoading(false);
-        }
-      }
-    };
-
-    getUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("[Navbar] Auth state changed:", _event, session?.user?.email);
-      if (!isMounted) return;
-
-      try {
-        const user = session?.user ?? null;
-        setUser(user);
-
-        // Set loading false IMMEDIATELY - don't wait for profile
-        setLoading(false);
-        console.log(
-          "[Navbar] Loading set to false, user:",
-          user?.email || "none",
-        );
-
-        if (user) {
-          console.log("[Navbar] Auth change - Fetching profile for:", user.id);
-
-          // Fetch profile async (don't block loading state)
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
-
-          console.log("[Navbar] Auth change - Profile data:", data);
-          console.log(
-            "[Navbar] Auth change - Profile error:",
-            error?.code,
-            error?.message,
-          );
-
-          if (isMounted) {
-            setProfile(data);
-            console.log("[Navbar] Profile set:", data?.full_name || "null");
-          }
-        } else {
-          if (isMounted) {
-            setProfile(null);
-            console.log("[Navbar] Profile cleared (no user)");
-          }
-        }
-      } catch (error) {
-        console.error("[Navbar] Error in auth state change:", error);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -142,130 +29,34 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Log render state changes for debugging
-  useEffect(() => {
-    console.log(
-      "[Navbar] Render state - Loading:",
-      loading,
-      "User:",
-      user?.email || "none",
-      "Profile:",
-      profile?.full_name || "none",
-    );
-  }, [loading, user, profile]);
-
-  // Log avatar changes for debugging
-  useEffect(() => {
-    if (user) {
-      console.log("[Navbar] User avatar URL:", user.user_metadata?.avatar_url);
-      console.log("[Navbar] Profile name:", profile?.full_name);
-      console.log("[Navbar] Profile role:", profile?.role);
-      console.log("[Navbar] Profile ID:", profile?.id);
-      console.log("[Navbar] User email:", user.email);
-      console.log("[Navbar] Is admin check:", profile?.role === "admin");
-    }
-  }, [user, profile]);
-
-  // Retry profile fetch if user exists but profile is null (race condition with dashboard profile creation)
-  useEffect(() => {
-    if (!user || profile) return; // Only retry if user exists but profile is null
-
-    console.log(
-      "[Navbar] Profile is null, scheduling retry fetch in 2 seconds...",
-    );
-
-    const retryTimer = setTimeout(async () => {
-      const supabase = createClient();
-      console.log("[Navbar] Retry - Fetching profile for:", user.id);
-
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      console.log("[Navbar] Retry - Profile data:", data);
-      console.log(
-        "[Navbar] Retry - Profile error:",
-        error?.code,
-        error?.message,
-      );
-
-      if (data) {
-        setProfile(data);
-        console.log("[Navbar] Retry - Profile found and set:", data.full_name);
-      } else {
-        console.log(
-          "[Navbar] Retry - Profile still not found, will not retry again",
-        );
-      }
-    }, 2000);
-
-    return () => clearTimeout(retryTimer);
-  }, [user, profile]);
-
   const forceRefreshProfile = async () => {
-    if (!user) return;
-
     setRefreshing(true);
-    console.log("[Navbar] Force refreshing profile...");
-
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-
-      if (error) {
-        console.error("[Navbar] Force refresh error:", error);
-      } else {
-        console.log("[Navbar] Force refresh - New profile data:", data);
-        setProfile(data);
-      }
+      await refreshProfile();
     } finally {
       setRefreshing(false);
     }
   };
 
   const handleLogout = async () => {
-    console.log("[Navbar] Logout button clicked");
-
-    // STEP 1: Clear UI state IMMEDIATELY (synchronous)
-    // This makes photo profile and dashboard access disappear instantly
-    console.log("[Navbar] Clearing UI state immediately...");
-    setUser(null);
-    setProfile(null);
     setDropdownOpen(false);
-    setLoading(true); // Show loading state
 
-    // STEP 2: Clear storage and sign out (async, but UI already cleared)
-    try {
-      const supabase = createClient();
+    // Clear storage
+    localStorage.clear();
+    sessionStorage.clear();
 
-      console.log("[Navbar] Clearing ALL storage...");
-      // Clear ALL localStorage and sessionStorage
-      localStorage.clear();
-      sessionStorage.clear();
+    // Clear cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
 
-      // Clear specific cookies
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-      });
+    // Sign out
+    await signOut();
 
-      console.log("[Navbar] Signing out from Supabase...");
-      // Sign out from Supabase
-      await supabase.auth.signOut({ scope: "global" });
-    } catch (error) {
-      console.error("[Navbar] Logout error:", error);
-    } finally {
-      // STEP 3: Force complete page reload (regardless of success/error)
-      console.log("[Navbar] Forcing complete page reload...");
-      window.location.replace("/auth/login");
-    }
+    // Force reload to login
+    window.location.replace("/auth/login");
   };
 
   const isActive = (path: string) => pathname === path;
@@ -319,7 +110,7 @@ export default function Navbar() {
                     Dashboard
                   </Link>
 
-                  {profile?.role === "admin" && (
+                  {isAdmin && (
                     <Link
                       href="/admin"
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -378,7 +169,7 @@ export default function Navbar() {
                       <p className="text-xs text-gray-500 truncate">
                         {user.email}
                       </p>
-                      {profile?.role === "admin" && (
+                      {isAdmin && (
                         <span className="inline-block mt-2 px-2 py-1 bg-linear-to-r from-primary-600 to-accent-600 text-white text-xs font-semibold rounded">
                           Admin
                         </span>
@@ -402,7 +193,7 @@ export default function Navbar() {
                       </button>
                     </div>
 
-                    {profile?.role === "admin" ? (
+                    {isAdmin ? (
                       <>
                         <Link
                           href="/admin"

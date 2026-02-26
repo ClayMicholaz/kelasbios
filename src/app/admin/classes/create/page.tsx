@@ -113,16 +113,27 @@ export default function CreateClassPage() {
       // Validate dates
       console.log("[CreateClass] Validating dates...");
       console.log("[CreateClass] Class date:", formData.class_date);
+      console.log("[CreateClass] Class time:", formData.class_time);
       console.log(
         "[CreateClass] Registration deadline:",
         formData.registration_deadline,
       );
 
-      const classDate = new Date(formData.class_date);
+      // Combine class_date and class_time for accurate comparison
+      const classDateTime = new Date(
+        `${formData.class_date}T${formData.class_time}`,
+      );
       const deadline = new Date(formData.registration_deadline);
 
-      if (deadline >= classDate) {
-        throw new Error("Batas pendaftaran harus sebelum tanggal kelas");
+      console.log("[CreateClass] Class DateTime object:", classDateTime);
+      console.log("[CreateClass] Deadline DateTime object:", deadline);
+
+      if (deadline >= classDateTime) {
+        throw new Error(
+          "Batas pendaftaran harus sebelum waktu mulai kelas. " +
+            `Deadline: ${deadline.toLocaleString("id-ID")}, ` +
+            `Kelas: ${classDateTime.toLocaleString("id-ID")}`,
+        );
       }
 
       console.log("[CreateClass] Date validation passed");
@@ -268,6 +279,12 @@ export default function CreateClassPage() {
         console.log("[CreateClass] Class created successfully:", insertedData);
         console.log("[CreateClass] Redirecting to /admin/classes");
 
+        // Show success message
+        alert(
+          `✅ Kelas "${formData.title}" berhasil dibuat!\n\nKelas akan muncul di list dalam beberapa detik.`,
+        );
+
+        // Redirect to admin classes page
         router.push("/admin/classes");
         router.refresh();
       } catch (dbError: any) {

@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary-700 via-primary-900 to-accent-600 text-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-linear-to-r from-primary-700 via-primary-900 to-accent-600 text-white rounded-lg shadow-md p-6 mb-8">
           <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-white/90">
             Kelola kelas, verifikasi pembayaran, dan pantau sistem

@@ -46,31 +46,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Auto-assign admin role to whitelisted emails
-  if (user) {
-    const adminEmails =
-      process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",").map((email) =>
-        email.trim(),
-      ) || [];
-
-    if (adminEmails.includes(user.email || "")) {
-      // Check if profile exists
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      // Update role to admin if not already admin
-      if (existingProfile && existingProfile.role !== "admin") {
-        await supabase
-          .from("profiles")
-          .update({ role: "admin" })
-          .eq("id", user.id);
-      }
-    }
-  }
-
   // Protected routes
   if (
     !user &&
