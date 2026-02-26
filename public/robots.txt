@@ -1,0 +1,22 @@
+# robots.txt for BIOS LMS - Universitas Bunda Mulia
+# This file tells search engines which pages to crawl and index
+
+# Allow all search engines to access public pages
+User-agent: *
+Allow: /
+Allow: /class/*
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /auth/login
+
+# Disallow private/authenticated pages
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /auth/callback
+Disallow: /api/
+
+# Disallow pages with query parameters (to avoid duplicate content)
+Disallow: /*?*
+
+# Sitemap location
+Sitemap: https://kelasbios.vercel.app/sitemap.xml

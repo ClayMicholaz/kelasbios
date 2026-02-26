@@ -11,6 +11,7 @@ export default function Navbar() {
   const { user, profile, loading, isAdmin, signOut, refreshProfile } =
     useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +29,30 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Close mobile menu when route changes or on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [mobileMenuOpen]);
 
   const forceRefreshProfile = async () => {
     setRefreshing(true);
@@ -65,9 +90,9 @@ export default function Navbar() {
     <nav className="bg-primary-950 shadow-md sticky top-0 z-50 border-b border-primary-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="flex items-center space-x-3 group">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-accent-bright/40 group-hover:ring-accent-bright transition-all">
+          <div className="flex items-center space-x-4 md:space-x-8">
+            <Link href="/" className="flex items-center space-x-2 md:space-x-3 group">
+              <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden ring-2 ring-accent-bright/40 group-hover:ring-accent-bright transition-all">
                 <Image
                   src="/logo-bios.svg"
                   alt="BIOS UBM"
@@ -78,13 +103,14 @@ export default function Navbar() {
                 />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-bold text-white">BIOS</span>
-                <span className="text-xs text-accent-bright">
+                <span className="text-base md:text-lg font-bold text-white">BIOS</span>
+                <span className="text-[10px] md:text-xs text-accent-bright hidden sm:block">
                   Learning Management System
                 </span>
               </div>
             </Link>
 
+            {/* Desktop Menu */}
             <div className="hidden md:flex space-x-1">
               <Link
                 href="/"
@@ -127,7 +153,38 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Mobile menu button */}
+            {user && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-primary-800 transition-colors"
+                aria-label="Toggle menu"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  {mobileMenuOpen ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  )}
+                </svg>
+              </button>
+            )}
             {loading ? (
               <div className="h-10 w-10 bg-primary-700/50 animate-pulse rounded-full"></div>
             ) : user ? (
@@ -237,13 +294,59 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/auth/login"
-                className="px-5 py-2.5 bg-linear-to-r from-accent-bright to-accent-500 text-primary-950 rounded-lg hover:from-accent-400 hover:to-accent-600 transition-all duration-200 text-sm font-bold"
+                className="px-3 py-2 md:px-5 md:py-2.5 bg-linear-to-r from-accent-bright to-accent-500 text-primary-950 rounded-lg hover:from-accent-400 hover:to-accent-600 transition-all duration-200 text-xs md:text-sm font-bold whitespace-nowrap"
               >
-                Masuk dengan Google UBM
+                <span className="hidden sm:inline">Masuk dengan Google UBM</span>
+                <span className="sm:hidden">Masuk</span>
               </Link>
             )}
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && user && (
+          <div className="md:hidden py-4 border-t border-primary-800">
+            <div className="space-y-2">
+              <Link
+                href="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/")
+                    ? "bg-accent-bright/10 text-accent-bright"
+                    : "text-gray-300 hover:text-white hover:bg-primary-800"
+                }`}
+              >
+                Beranda
+              </Link>
+
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  isActive("/dashboard")
+                    ? "bg-accent-bright/20 text-accent-bright"
+                    : "text-gray-200 hover:bg-primary-700/50 hover:text-white"
+                }`}
+              >
+                Dashboard
+              </Link>
+
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    pathname?.startsWith("/admin")
+                      ? "bg-accent-bright/20 text-accent-bright"
+                      : "text-gray-200 hover:bg-primary-700/50 hover:text-white"
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

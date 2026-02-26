@@ -2,8 +2,22 @@ import { createClient } from "@/lib/supabase/server";
 import ClassCard from "@/components/ClassCard";
 import EmptyState from "@/components/EmptyState";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Beranda - Daftar Kelas Terbuka",
+  description:
+    "Temukan dan daftarkan diri Anda ke kelas-kelas terbuka di BIOS LMS. Platform pembelajaran online untuk mahasiswa Teknik Informatika Universitas Bunda Mulia (UBM) Ancol, Jakarta.",
+  openGraph: {
+    title: "BIOS LMS - Daftar Kelas Terbuka",
+    description:
+      "Temukan kelas-kelas terbuka untuk mahasiswa Teknik Informatika UBM. Belajar pemrograman, struktur data, dan mata kuliah lainnya.",
+    url: "https://kelasbios.vercel.app",
+    type: "website",
+  },
+};
 
 export default async function Home() {
   const supabase = await createClient();
@@ -42,40 +56,41 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-primary-950 text-white py-20">
+      <section className="bg-primary-950 text-white py-12 sm:py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 text-white">
               Selamat Datang di BIOS LMS
             </h1>
-            <p className="text-xl md:text-2xl mb-4 text-accent-bright">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 md:mb-4 text-accent-bright">
               Platform Pembelajaran Eksklusif untuk Mahasiswa Teknik Informatika
               UBM
             </p>
-            <p className="text-lg mb-8 max-w-2xl mx-auto text-gray-300">
+            <p className="text-sm sm:text-base md:text-lg mb-6 md:mb-8 max-w-2xl mx-auto text-gray-300 px-4">
               Tingkatkan keterampilan Anda dengan bergabung di kelas-kelas
               eksklusif BIOS. Hanya Rp 10.000 per sesi untuk pembelajaran
               intensif selama 2 jam!
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 px-4">
               {!user ? (
                 <Link
                   href="/auth/login"
-                  className="px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-lg"
+                  className="px-6 md:px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-base md:text-lg"
                 >
-                  Masuk dengan Google UBM
+                  <span className="hidden sm:inline">Masuk dengan Google UBM</span>
+                  <span className="sm:hidden">Masuk Google UBM</span>
                 </Link>
               ) : (
                 <Link
                   href="/dashboard"
-                  className="px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-lg"
+                  className="px-6 md:px-8 py-3 bg-accent-bright text-primary-950 rounded-lg hover:bg-accent-400 transition-colors font-semibold text-base md:text-lg"
                 >
                   Ke Dashboard
                 </Link>
               )}
               <Link
                 href="#classes"
-                className="px-8 py-3 bg-transparent text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-lg border-2 border-white"
+                className="px-6 md:px-8 py-3 bg-transparent text-white rounded-lg hover:bg-white/10 transition-colors font-medium text-base md:text-lg border-2 border-white"
               >
                 Lihat Kelas
               </Link>
@@ -85,13 +100,13 @@ export default async function Home() {
       </section>
 
       {/* Classes Section */}
-      <section id="classes" className="py-16 bg-white">
+      <section id="classes" className="py-12 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 md:mb-4">
               Kelas yang Tersedia
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto px-4">
               Pilih kelas yang sesuai dengan minat dan kebutuhan Anda. Daftar
               sekarang sebelum tempat habis!
             </p>
@@ -134,19 +149,19 @@ export default async function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-3 text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 md:mb-3 text-gray-900">
             Mengapa Memilih BIOS LMS?
           </h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-sm sm:text-base text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto px-4">
             Platform pembelajaran terbaik untuk mahasiswa Teknik Informatika UBM
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="text-center p-5 sm:p-6 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="w-8 h-8 text-primary-800"
+                  className="w-7 h-7 sm:w-8 sm:h-8 text-primary-800"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -159,19 +174,19 @@ export default async function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900">
                 Materi Berkualitas
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Kurikulum yang dirancang khusus dengan materi terkini dan
                 relevan
               </p>
             </div>
 
-            <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center p-5 sm:p-6 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="w-8 h-8 text-primary-800"
+                  className="w-7 h-7 sm:w-8 sm:h-8 text-primary-800"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -184,18 +199,18 @@ export default async function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900">
                 Harga Terjangkau
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Hanya Rp 10.000 untuk sesi pembelajaran 2 jam yang intensif
               </p>
             </div>
 
-            <div className="text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="text-center p-5 sm:p-6 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <svg
-                  className="w-8 h-8 text-primary-800"
+                  className="w-7 h-7 sm:w-8 sm:h-8 text-primary-800"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -208,10 +223,10 @@ export default async function Home() {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900">
                 Kelas Eksklusif
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-xs sm:text-sm">
                 Jumlah peserta terbatas untuk pengalaman belajar yang optimal
               </p>
             </div>
@@ -220,26 +235,27 @@ export default async function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary-700 text-white">
+      <section className="py-12 md:py-16 bg-primary-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 md:mb-4">
             Siap Meningkatkan Keterampilan Anda?
           </h2>
-          <p className="text-xl mb-8 text-accent-100">
+          <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-accent-100">
             Bergabunglah dengan ribuan mahasiswa yang telah mengambil kelas di
             BIOS LMS
           </p>
           {!user ? (
             <Link
               href="/auth/login"
-              className="inline-block px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-lg shadow-lg"
+              className="inline-block px-6 md:px-8 py-3 md:py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-base md:text-lg shadow-lg"
             >
-              Masuk Sekarang
+              <span className="hidden sm:inline">Masuk Sekarang</span>
+              <span className="sm:hidden">Masuk</span>
             </Link>
           ) : (
             <Link
               href="/dashboard"
-              className="inline-block px-8 py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-lg shadow-lg"
+              className="inline-block px-6 md:px-8 py-3 md:py-4 bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition-colors font-semibold text-base md:text-lg shadow-lg"
             >
               Lihat Kelas Saya
             </Link>

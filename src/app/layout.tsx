@@ -104,8 +104,51 @@ export const metadata: Metadata = {
   applicationName: "BIOS LMS",
   referrer: "origin-when-cross-origin",
 
-  // Manifest for PWA (if you add one later)
-  // manifest: "/manifest.json",
+  // Manifest for PWA
+  manifest: "/manifest.json",
+
+  // Canonical URL
+  metadataBase: new URL("https://kelasbios.vercel.app"),
+
+  // Alternate languages (if you plan to support multiple languages)
+  alternates: {
+    canonical: "/",
+    languages: {
+      "id-ID": "/",
+    },
+  },
+
+  // Additional icons for various platforms
+  icons: {
+    icon: [
+      { url: "/logo-bios.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+    ],
+    apple: [{ url: "/logo.png", sizes: "180x180", type: "image/png" }],
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/logo-bios.svg",
+      },
+    ],
+  },
+
+  // Theme color for mobile browsers
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1e3a8a" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e3a8a" },
+  ],
+
+  // Additional metadata for better SEO
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "apple-mobile-web-app-title": "BIOS LMS",
+    "application-name": "BIOS LMS",
+    "msapplication-TileColor": "#1e3a8a",
+    "msapplication-config": "/browserconfig.xml",
+  },
 };
 
 export default function RootLayout({
@@ -113,8 +156,67 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // JSON-LD Structured Data for SEO
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "BIOS - Bina Informatika Optimis Sukses",
+    alternateName: "Himpunan Mahasiswa Teknik Informatika UBM",
+    url: "https://kelasbios.vercel.app",
+    logo: "https://kelasbios.vercel.app/logo-bios.svg",
+    description:
+      "Himpunan Mahasiswa Teknik Informatika Universitas Bunda Mulia (UBM) Ancol, Jakarta",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Jl. Lodan Raya No.2",
+      addressLocality: "Ancol",
+      addressRegion: "Jakarta Utara",
+      postalCode: "14430",
+      addressCountry: "ID",
+    },
+    parentOrganization: {
+      "@type": "EducationalOrganization",
+      name: "Universitas Bunda Mulia",
+      url: "https://www.ubm.ac.id",
+    },
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "BIOS LMS - Learning Management System",
+    url: "https://kelasbios.vercel.app",
+    description:
+      "Platform Learning Management System untuk mahasiswa Teknik Informatika Universitas Bunda Mulia",
+    inLanguage: "id-ID",
+    publisher: {
+      "@type": "Organization",
+      name: "BIOS UBM",
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://kelasbios.vercel.app/?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="id">
+      <head>
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema),
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >

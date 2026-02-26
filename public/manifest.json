@@ -1,0 +1,32 @@
+{
+  "name": "BIOS LMS - Learning Management System UBM",
+  "short_name": "BIOS LMS",
+  "description": "Platform Learning Management System untuk mahasiswa Teknik Informatika Universitas Bunda Mulia (UBM) Ancol, Jakarta",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait-primary",
+  "categories": ["education", "learning"],
+  "icons": [
+    {
+      "src": "/logo-bios.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/logo-bios.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "scope": "/",
+  "lang": "id-ID",
+  "dir": "ltr"
+}

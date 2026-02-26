@@ -191,7 +191,7 @@ export default function PaymentUpload({
             </p>
             <p>
               <strong>No. Rekening:</strong>{" "}
-              {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER || "1234567890"}
+              {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER || "100271468145"}
             </p>
             <p>
               <strong>Atas Nama:</strong>{" "}

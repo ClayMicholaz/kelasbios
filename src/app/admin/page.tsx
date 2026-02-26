@@ -343,10 +343,10 @@ export default async function AdminDashboard() {
                             {(enrollment.profiles as any)?.full_name ||
                               (enrollment.profiles as any)?.email}
                           </h3>
-                        <p className="text-sm text-gray-900 font-medium mt-1">
-                          {(enrollment.classes as any)?.title}
-                        </p>
-                        <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-sm text-gray-900 font-medium mt-1">
+                            {(enrollment.classes as any)?.title}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1">
                             {new Date(enrollment.created_at).toLocaleDateString(
                               "id-ID",
                             )}

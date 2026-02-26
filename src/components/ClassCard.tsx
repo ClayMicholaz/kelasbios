@@ -24,13 +24,13 @@ export default function ClassCard({
 
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-200 border border-gray-200">
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="text-xl font-bold text-gray-900 line-clamp-2">
+      <div className="p-4 sm:p-6">
+        <div className="flex justify-between items-start mb-3 gap-2">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-2 flex-1">
             {classData.title}
           </h3>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            className={`px-2 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
               classData.status === "open"
                 ? "bg-emerald-100 text-emerald-700"
                 : classData.status === "closed"
@@ -46,14 +46,14 @@ export default function ClassCard({
           </span>
         </div>
 
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+        <p className="text-gray-600 text-xs sm:text-sm mb-4 line-clamp-3 leading-relaxed">
           {classData.description}
         </p>
 
-        <div className="space-y-2 mb-4 text-sm">
+        <div className="space-y-2 mb-4 text-xs sm:text-sm">
           <div className="flex items-center text-gray-700">
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4 mr-2 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -65,7 +65,7 @@ export default function ClassCard({
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span>
+            <span className="truncate">
               {formatDate(classData.class_date)} •{" "}
               {formatTime(classData.class_time)}
             </span>
@@ -73,7 +73,7 @@ export default function ClassCard({
 
           <div className="flex items-center text-gray-700">
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4 mr-2 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -90,7 +90,7 @@ export default function ClassCard({
 
           <div className="flex items-center text-gray-700">
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4 mr-2 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -102,12 +102,12 @@ export default function ClassCard({
                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
               />
             </svg>
-            <span>{classData.classroom}</span>
+            <span className="truncate">{classData.classroom}</span>
           </div>
 
           <div className="flex items-center text-gray-700">
             <svg
-              className="w-4 h-4 mr-2"
+              className="w-4 h-4 mr-2 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -131,9 +131,9 @@ export default function ClassCard({
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-          <div>
-            <p className="text-2xl font-bold text-primary-950">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 border-t border-gray-200 gap-3">
+          <div className="flex-1">
+            <p className="text-xl sm:text-2xl font-bold text-primary-950">
               {formatCurrency(10000)}
             </p>
             {!isDeadlinePassed && (
@@ -148,7 +148,7 @@ export default function ClassCard({
           {showEnrollButton && classData.status === "open" && (
             <Link
               href={`/class/${classData.slug || classData.id}`}
-              className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
+              className={`w-full sm:w-auto text-center px-4 sm:px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
                 isDeadlinePassed || isFull
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-primary-800 text-white hover:bg-primary-700"
