@@ -24,7 +24,12 @@ export default function PaymentUpload({
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type - only allow specific image formats
-      const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
       if (!allowedTypes.includes(file.type)) {
         setError("Format file tidak didukung. Gunakan JPEG, PNG, atau WebP");
         return;
@@ -77,7 +82,8 @@ export default function PaymentUpload({
         .createSignedUrl(fileName, 60 * 60 * 24 * 365 * 10); // 10 years
 
       if (urlError) throw urlError;
-      if (!signedUrlData?.signedUrl) throw new Error("Failed to get signed URL");
+      if (!signedUrlData?.signedUrl)
+        throw new Error("Failed to get signed URL");
 
       // Update enrollment with payment proof
       const { error: updateError } = await supabase
@@ -145,17 +151,19 @@ export default function PaymentUpload({
             </p>
             <p>
               <strong>Atas Nama:</strong>{" "}
-              {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || "BIOS Organization"}
+              {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NAME || "Christoper Harris"}
             </p>
             <p>
               <strong>Jumlah:</strong> Rp 10.000
             </p>
           </div>
           <p className="text-xs text-primary-700 mt-3 pt-2 border-t border-primary-200">
-            <strong>Limitasi Upload:</strong><br/>
-            • Format: JPEG, PNG, atau WebP<br/>
-            • Ukuran maksimal: 5MB<br/>
-            • Pastikan bukti transfer jelas dan dapat dibaca
+            <strong>Limitasi Upload:</strong>
+            <br />
+            • Format: JPEG, PNG, atau WebP
+            <br />
+            • Ukuran maksimal: 5MB
+            <br />• Pastikan bukti transfer jelas dan dapat dibaca
           </p>
         </div>
       </div>
