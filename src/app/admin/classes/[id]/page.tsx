@@ -114,24 +114,24 @@ export default async function AdminClassDetailPage({
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Tanggal & Waktu</p>
-              <p className="font-semibold">
+              <p className="font-semibold text-gray-900">
                 {formatDate(classData.class_date)}
               </p>
-              <p className="font-semibold">
+              <p className="font-semibold text-gray-900">
                 {formatTime(classData.class_time)}
               </p>
             </div>
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Ruangan</p>
-              <p className="font-semibold">{classData.classroom}</p>
+              <p className="font-semibold text-gray-900">{classData.classroom}</p>
             </div>
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Durasi</p>
-              <p className="font-semibold">{classData.duration_hours} jam</p>
+              <p className="font-semibold text-gray-900">{classData.duration_hours} jam</p>
             </div>
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Kapasitas</p>
-              <p className="font-semibold">
+              <p className="font-semibold text-gray-900">
                 {verifiedEnrollments.length} / {classData.max_participants}
               </p>
             </div>
