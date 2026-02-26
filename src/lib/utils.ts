@@ -135,3 +135,60 @@ export function getCountdownText(deadline: string): string {
 
   return "Tutup hari ini";
 }
+
+/**
+ * Convert datetime-local input (WIB/Asia Jakarta timezone) to UTC ISO string
+ * for storing in Supabase database
+ *
+ * @param datetimeLocal - String from datetime-local input (e.g., "2026-02-27T08:00")
+ * @returns ISO string in UTC timezone (e.g., "2026-02-27T01:00:00.000Z")
+ *
+ * @example
+ * // User inputs 8 AM WIB
+ * convertWIBToUTC("2026-02-27T08:00")
+ * // Returns: "2026-02-27T01:00:00.000Z" (1 AM UTC)
+ */
+export function convertWIBToUTC(datetimeLocal: string): string {
+  if (!datetimeLocal) return datetimeLocal;
+
+  // Parse the datetime-local string (assumes WIB timezone)
+  // Format: "YYYY-MM-DDTHH:mm"
+  const date = new Date(datetimeLocal);
+
+  // Get UTC time from the date object
+  // datetime-local is interpreted as local time by browser
+  // We need to manually adjust for WIB (UTC+7)
+  const wibOffset = 7 * 60; // WIB is UTC+7 in minutes
+  const localOffset = date.getTimezoneOffset(); // Browser's timezone offset
+
+  // Calculate the difference and adjust
+  const offsetDiff = wibOffset + localOffset;
+  date.setMinutes(date.getMinutes() - offsetDiff);
+
+  return date.toISOString();
+}
+
+/**
+ * Convert UTC timestamp to WIB datetime-local format for form input
+ *
+ * @param utcTimestamp - UTC timestamp string from database
+ * @returns datetime-local format string (e.g., "2026-02-27T08:00")
+ */
+export function convertUTCToWIBLocal(utcTimestamp: string): string {
+  if (!utcTimestamp) return "";
+
+  const date = new Date(utcTimestamp);
+
+  // WIB is UTC+7
+  const wibOffset = 7 * 60; // minutes
+  const wibDate = new Date(date.getTime() + wibOffset * 60 * 1000);
+
+  // Format as datetime-local: YYYY-MM-DDTHH:mm
+  const year = wibDate.getUTCFullYear();
+  const month = String(wibDate.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(wibDate.getUTCDate()).padStart(2, "0");
+  const hours = String(wibDate.getUTCHours()).padStart(2, "0");
+  const minutes = String(wibDate.getUTCMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}

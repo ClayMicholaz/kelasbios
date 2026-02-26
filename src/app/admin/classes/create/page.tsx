@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { convertWIBToUTC } from "@/lib/utils";
 import Link from "next/link";
 
 export default function CreateClassPage() {
@@ -235,7 +236,7 @@ export default function CreateClassPage() {
         max_participants: formData.max_participants,
         class_date: formData.class_date,
         class_time: formData.class_time,
-        registration_deadline: formData.registration_deadline,
+        registration_deadline: convertWIBToUTC(formData.registration_deadline),
         materials: allMaterials.length > 0 ? allMaterials : null,
         practice_questions: parsedQuestions,
         created_by: user.id,
@@ -470,7 +471,8 @@ export default function CreateClassPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Batas Pendaftaran *
+                Batas Pendaftaran *{" "}
+                <span className="text-xs text-gray-500">(Waktu WIB)</span>
               </label>
               <input
                 type="datetime-local"
@@ -481,7 +483,8 @@ export default function CreateClassPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               />
               <p className="text-sm text-gray-500 mt-1">
-                Harus sebelum tanggal kelas
+                Harus sebelum tanggal kelas. Masukkan waktu dalam zona WIB
+                (UTC+7)
               </p>
             </div>
 

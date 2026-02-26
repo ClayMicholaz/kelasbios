@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import EnrollButton from "./EnrollButton";
 import CountdownTimer from "@/components/CountdownTimer";
+import MaterialsViewer from "@/components/MaterialsViewer";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -371,7 +372,7 @@ export default async function ClassDetailPage({
                       {formatDate(classData.registration_deadline)}
                     </p>
                     {!isDeadlinePassed && (
-                      <CountdownTimer 
+                      <CountdownTimer
                         deadline={classData.registration_deadline}
                         className="text-sm text-orange-600 mt-1 block"
                       />
@@ -494,6 +495,14 @@ export default async function ClassDetailPage({
                         )}
                       </ul>
                     </div>
+                  </div>
+                )}
+
+              {/* Materials Viewer - Only for enrolled & verified students after class starts */}
+              {userEnrollment &&
+                userEnrollment.payment_status === "verified" && (
+                  <div className="mb-8">
+                    <MaterialsViewer classId={classData.id} />
                   </div>
                 )}
             </div>

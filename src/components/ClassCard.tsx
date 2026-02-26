@@ -145,7 +145,7 @@ export default function ClassCard({
               {formatCurrency(10000)}
             </p>
             {!isDeadlinePassed && (
-              <CountdownTimer 
+              <CountdownTimer
                 deadline={classData.registration_deadline}
                 className="text-xs text-gray-500"
               />
