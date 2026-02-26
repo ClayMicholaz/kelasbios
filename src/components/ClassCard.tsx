@@ -147,7 +147,7 @@ export default function ClassCard({
 
           {showEnrollButton && classData.status === "open" && (
             <Link
-              href={`/class/${classData.id}`}
+              href={`/class/${classData.slug || classData.id}`}
               className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
                 isDeadlinePassed || isFull
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"

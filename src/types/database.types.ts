@@ -53,6 +53,7 @@ export interface Database {
           materials: Json[] | null;
           practice_questions: Json | null;
           status: "open" | "closed" | "completed";
+          slug: string;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -71,6 +72,7 @@ export interface Database {
           materials?: Json[] | null;
           practice_questions?: Json | null;
           status?: "open" | "closed" | "completed";
+          slug?: string;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -89,6 +91,7 @@ export interface Database {
           materials?: Json[] | null;
           practice_questions?: Json | null;
           status?: "open" | "closed" | "completed";
+          slug?: string;
           created_by?: string;
           created_at?: string;
           updated_at?: string;

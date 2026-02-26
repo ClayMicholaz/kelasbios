@@ -324,7 +324,8 @@ export default async function DashboardPage() {
                         {(enrollment.classes as any)?.title}
                       </h3>
                       <p className="text-sm text-blue-900 font-medium mb-2">
-                        Bukti pembayaran Anda sedang diverifikasi oleh admin. Mohon tunggu.
+                        Bukti pembayaran Anda sedang diverifikasi oleh admin.
+                        Mohon tunggu.
                       </p>
                       <div className="space-y-1 text-sm text-gray-700">
                         <p>
@@ -512,7 +513,7 @@ export default async function DashboardPage() {
                     )}
 
                     <Link
-                      href={`/class/${(enrollment.classes as any)?.id}/materials`}
+                      href={`/class/${(enrollment.classes as any)?.slug || (enrollment.classes as any)?.id}/materials`}
                       className="mt-4 block w-full px-4 py-2 bg-primary-600 text-white text-center rounded-lg hover:bg-primary-700 transition-colors font-medium"
                     >
                       Lihat Materi & Latihan

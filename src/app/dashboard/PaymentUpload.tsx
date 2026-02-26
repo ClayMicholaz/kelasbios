@@ -61,7 +61,8 @@ export default function PaymentUpload({
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) throw new Error("User tidak terautentikasi. Silakan login ulang.");
+      if (!user)
+        throw new Error("User tidak terautentikasi. Silakan login ulang.");
 
       // Upload file to storage
       const fileExt = selectedFile.name.split(".").pop();
@@ -78,15 +79,17 @@ export default function PaymentUpload({
 
       if (uploadError) {
         console.error("[PaymentUpload] Upload error:", uploadError);
-        
+
         // Handle specific RLS error
-        if (uploadError.message?.includes("row-level security") || 
-            uploadError.message?.includes("policy")) {
+        if (
+          uploadError.message?.includes("row-level security") ||
+          uploadError.message?.includes("policy")
+        ) {
           throw new Error(
-            "Sistem belum dikonfigurasi dengan benar. Silakan hubungi admin untuk mengaktifkan storage policy."
+            "Sistem belum dikonfigurasi dengan benar. Silakan hubungi admin untuk mengaktifkan storage policy.",
           );
         }
-        
+
         throw new Error(uploadError.message || "Gagal mengunggah file");
       }
 
@@ -101,7 +104,7 @@ export default function PaymentUpload({
         console.error("[PaymentUpload] Signed URL error:", urlError);
         throw new Error("Gagal membuat URL file");
       }
-      
+
       if (!signedUrlData?.signedUrl) {
         throw new Error("Gagal mendapatkan URL file");
       }
@@ -120,16 +123,20 @@ export default function PaymentUpload({
 
       if (updateError) {
         console.error("[PaymentUpload] Update enrollment error:", updateError);
-        
+
         // Handle specific RLS error for enrollments table
-        if (updateError.message?.includes("row-level security") || 
-            updateError.message?.includes("policy")) {
+        if (
+          updateError.message?.includes("row-level security") ||
+          updateError.message?.includes("policy")
+        ) {
           throw new Error(
-            "Tidak dapat memperbarui data pembayaran. Silakan hubungi admin."
+            "Tidak dapat memperbarui data pembayaran. Silakan hubungi admin.",
           );
         }
-        
-        throw new Error(updateError.message || "Gagal menyimpan data pembayaran");
+
+        throw new Error(
+          updateError.message || "Gagal menyimpan data pembayaran",
+        );
       }
 
       console.log("[PaymentUpload] Enrollment updated successfully");

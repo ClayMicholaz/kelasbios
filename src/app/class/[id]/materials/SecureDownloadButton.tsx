@@ -50,9 +50,7 @@ export default function SecureDownloadButton({
       }, 100);
     } catch (err) {
       console.error("Download error:", err);
-      setError(
-        err instanceof Error ? err.message : "Gagal mengunduh file",
-      );
+      setError(err instanceof Error ? err.message : "Gagal mengunduh file");
     } finally {
       setDownloading(false);
     }
@@ -100,9 +98,7 @@ export default function SecureDownloadButton({
           "Download"
         )}
       </button>
-      {error && (
-        <p className="text-xs text-red-600 mt-1">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
     </div>
   );
 }

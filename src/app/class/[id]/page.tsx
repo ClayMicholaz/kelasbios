@@ -5,6 +5,7 @@ import {
   formatTime,
   formatCurrency,
   getDaysRemaining,
+  isUUID,
 } from "@/lib/utils";
 import Link from "next/link";
 import EnrollButton from "./EnrollButton";
@@ -22,11 +23,12 @@ export default async function ClassDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Get class details
+  // Get class details - support both UUID and slug
+  const queryField = isUUID(id) ? "id" : "slug";
   const { data: classData, error } = await supabase
     .from("classes")
     .select("*")
-    .eq("id", id)
+    .eq(queryField, id)
     .single();
 
   if (error || !classData) {
@@ -37,7 +39,7 @@ export default async function ClassDetailPage({
   const { data: enrollments } = await supabase
     .from("enrollments")
     .select("id, payment_status")
-    .eq("class_id", id)
+    .eq("class_id", classData.id)
     .eq("payment_status", "verified");
 
   const enrollmentCount = enrollments?.length || 0;
@@ -49,7 +51,7 @@ export default async function ClassDetailPage({
     const { data } = await supabase
       .from("enrollments")
       .select("*")
-      .eq("class_id", id)
+      .eq("class_id", classData.id)
       .eq("user_id", user.id)
       .single();
 
@@ -86,7 +88,7 @@ export default async function ClassDetailPage({
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-primary-700 via-primary-900 to-accent-600 text-white px-8 py-12">
+          <div className="bg-linear-to-r from-primary-700 via-primary-900 to-accent-600 text-white px-8 py-12">
             <div className="flex justify-between items-start mb-4">
               <h1 className="text-3xl md:text-4xl font-bold">
                 {classData.title}
@@ -136,10 +138,10 @@ export default async function ClassDetailPage({
                     <p className="font-semibold text-gray-900">
                       Tanggal & Waktu
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-900">
                       {formatDate(classData.class_date)}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-900">
                       Pukul {formatTime(classData.class_time)}
                     </p>
                   </div>
@@ -161,7 +163,7 @@ export default async function ClassDetailPage({
                   </svg>
                   <div>
                     <p className="font-semibold text-gray-900">Durasi</p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-900">
                       {classData.duration_hours} jam
                     </p>
                   </div>
@@ -183,7 +185,7 @@ export default async function ClassDetailPage({
                   </svg>
                   <div>
                     <p className="font-semibold text-gray-900">Ruangan</p>
-                    <p className="text-gray-600">{classData.classroom}</p>
+                    <p className="text-gray-900">{classData.classroom}</p>
                   </div>
                 </div>
 
@@ -204,7 +206,7 @@ export default async function ClassDetailPage({
                   <div>
                     <p className="font-semibold text-gray-900">Kapasitas</p>
                     <p
-                      className={`font-semibold ${availableSeats < 5 ? "text-orange-600" : "text-gray-600"}`}
+                      className={`font-semibold ${availableSeats < 5 ? "text-orange-600" : "text-gray-900"}`}
                     >
                       {availableSeats} / {classData.max_participants} kursi
                       tersisa
@@ -281,7 +283,15 @@ export default async function ClassDetailPage({
                             : "bg-red-100 border border-red-300"
                       }`}
                     >
-                      <p className="font-semibold">
+                      <p
+                        className={`font-semibold ${
+                          userEnrollment.payment_status === "verified"
+                            ? "text-green-900"
+                            : userEnrollment.payment_status === "pending"
+                              ? "text-yellow-900"
+                              : "text-red-900"
+                        }`}
+                      >
                         {userEnrollment.payment_status === "verified" &&
                           "✓ Anda sudah terdaftar"}
                         {userEnrollment.payment_status === "pending" &&
@@ -289,7 +299,15 @@ export default async function ClassDetailPage({
                         {userEnrollment.payment_status === "rejected" &&
                           "✗ Pembayaran ditolak"}
                       </p>
-                      <p className="text-sm mt-1">
+                      <p
+                        className={`text-sm mt-1 ${
+                          userEnrollment.payment_status === "verified"
+                            ? "text-green-900"
+                            : userEnrollment.payment_status === "pending"
+                              ? "text-yellow-900"
+                              : "text-red-900"
+                        }`}
+                      >
                         {userEnrollment.payment_status === "verified" &&
                           "Sampai jumpa di kelas!"}
                         {userEnrollment.payment_status === "pending" &&

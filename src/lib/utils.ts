@@ -16,8 +16,8 @@ export function formatCurrency(amount: number): string {
 export function formatDate(date: string): string {
   // Convert to WIB (UTC+7)
   const utcDate = new Date(date);
-  const wibDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000));
-  
+  const wibDate = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000);
+
   return wibDate.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
@@ -29,8 +29,8 @@ export function formatDate(date: string): string {
 export function formatDateTime(date: string): string {
   // Convert to WIB (UTC+7)
   const utcDate = new Date(date);
-  const wibDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000));
-  
+  const wibDate = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000);
+
   return wibDate.toLocaleString("id-ID", {
     day: "numeric",
     month: "long",
@@ -78,4 +78,19 @@ export function getTimeRemaining(deadline: string): {
 
 export function isValidUBMEmail(email: string): boolean {
   return email.endsWith("@student.ubm.ac.id");
+}
+
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
+}
+
+export function isUUID(str: string): boolean {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
 }

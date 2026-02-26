@@ -281,7 +281,7 @@ export default async function AdminDashboard() {
                 recentClasses.map((cls) => (
                   <Link
                     key={cls.id}
-                    href={`/admin/classes/${cls.id}`}
+                    href={`/admin/classes/${cls.slug || cls.id}`}
                     className="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex justify-between items-start">
@@ -343,10 +343,10 @@ export default async function AdminDashboard() {
                             {(enrollment.profiles as any)?.full_name ||
                               (enrollment.profiles as any)?.email}
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {(enrollment.classes as any)?.title}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-sm text-gray-900 font-medium mt-1">
+                          {(enrollment.classes as any)?.title}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
                             {new Date(enrollment.created_at).toLocaleDateString(
                               "id-ID",
                             )}

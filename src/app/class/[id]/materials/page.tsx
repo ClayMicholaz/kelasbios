@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import PracticeQuiz from "./PracticeQuiz";
 import SecureDownloadButton from "./SecureDownloadButton";
+import { isUUID } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -21,11 +22,12 @@ export default async function ClassMaterialsPage({
     redirect("/auth/login");
   }
 
-  // Get class details
+  // Get class details - support both UUID and slug
+  const queryField = isUUID(id) ? "id" : "slug";
   const { data: classData, error } = await supabase
     .from("classes")
     .select("*")
-    .eq("id", id)
+    .eq(queryField, id)
     .single();
 
   if (error || !classData) {
@@ -36,7 +38,7 @@ export default async function ClassMaterialsPage({
   const { data: enrollment } = await supabase
     .from("enrollments")
     .select("*")
-    .eq("class_id", id)
+    .eq("class_id", classData.id)
     .eq("user_id", user.id)
     .eq("payment_status", "verified")
     .single();

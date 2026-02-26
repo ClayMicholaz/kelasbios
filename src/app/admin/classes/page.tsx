@@ -143,7 +143,7 @@ export default async function AdminClassesPage() {
                   <ClassCard classData={classItem} showEnrollButton={false} />
                   <div className="mt-2 flex gap-2">
                     <Link
-                      href={`/admin/classes/${classItem.id}`}
+                      href={`/admin/classes/${classItem.slug || classItem.id}`}
                       className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-center text-sm font-medium"
                     >
                       Detail & Absensi
@@ -166,7 +166,7 @@ export default async function AdminClassesPage() {
                 <div key={classItem.id}>
                   <ClassCard classData={classItem} showEnrollButton={false} />
                   <Link
-                    href={`/admin/classes/${classItem.id}`}
+                    href={`/admin/classes/${classItem.slug || classItem.id}`}
                     className="mt-2 block px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-center text-sm font-medium"
                   >
                     Lihat Detail
@@ -188,7 +188,7 @@ export default async function AdminClassesPage() {
                 <div key={classItem.id}>
                   <ClassCard classData={classItem} showEnrollButton={false} />
                   <Link
-                    href={`/admin/classes/${classItem.id}`}
+                    href={`/admin/classes/${classItem.slug || classItem.id}`}
                     className="mt-2 block px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-center text-sm font-medium"
                   >
                     Lihat Detail

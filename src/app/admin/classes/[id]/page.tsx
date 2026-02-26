@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { formatDate, formatTime, formatCurrency } from "@/lib/utils";
+import { formatDate, formatTime, formatCurrency, isUUID } from "@/lib/utils";
 import AttendanceCheck from "./AttendanceCheck";
 
 export const dynamic = "force-dynamic";
@@ -32,11 +32,12 @@ export default async function AdminClassDetailPage({
     redirect("/403");
   }
 
-  // Get class details
+  // Get class details - support both UUID and slug
+  const queryField = isUUID(id) ? "id" : "slug";
   const { data: classData, error } = await supabase
     .from("classes")
     .select("*")
-    .eq("id", id)
+    .eq(queryField, id)
     .single();
 
   if (error || !classData) {
@@ -52,7 +53,7 @@ export default async function AdminClassDetailPage({
       profiles:user_id(full_name, email)
     `,
     )
-    .eq("class_id", id)
+    .eq("class_id", classData.id)
     .order("created_at", { ascending: true });
 
   const verifiedEnrollments =
