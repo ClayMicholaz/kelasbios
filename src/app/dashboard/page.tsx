@@ -197,13 +197,13 @@ export default async function DashboardPage() {
                 <p className="text-sm text-gray-600 mb-1">
                   Menunggu Verifikasi
                 </p>
-                <p className="text-3xl font-bold text-yellow-600">
+                <p className="text-3xl font-bold text-orange-600">
                   {pendingPayments.length}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                 <svg
-                  className="w-6 h-6 text-yellow-600"
+                  className="w-6 h-6 text-orange-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -256,14 +256,19 @@ export default async function DashboardPage() {
               {pendingPayments.map((enrollment) => (
                 <div
                   key={enrollment.id}
-                  className="bg-yellow-50 border border-yellow-200 rounded-lg p-6"
+                  className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6"
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div className="flex-1 mb-4 md:mb-0">
+                      <div className="flex items-start gap-2 mb-3">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                          Menunggu Upload
+                        </span>
+                      </div>
                       <h3 className="text-lg font-bold text-gray-900 mb-2">
                         {(enrollment.classes as any)?.title}
                       </h3>
-                      <div className="space-y-1 text-sm text-gray-600">
+                      <div className="space-y-1 text-sm text-gray-700">
                         <p>
                           <span className="font-semibold">Tanggal:</span>{" "}
                           {formatDate((enrollment.classes as any)?.class_date)}{" "}
@@ -299,18 +304,23 @@ export default async function DashboardPage() {
               {rejectedPayments.map((enrollment) => (
                 <div
                   key={enrollment.id}
-                  className="bg-red-50 border border-red-200 rounded-lg p-6"
+                  className="bg-red-50 border-2 border-red-300 rounded-lg p-6"
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div className="flex-1 mb-4 md:mb-0">
+                      <div className="flex items-start gap-2 mb-3">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          Ditolak
+                        </span>
+                      </div>
                       <h3 className="text-lg font-bold text-gray-900 mb-2">
                         {(enrollment.classes as any)?.title}
                       </h3>
-                      <p className="text-sm text-red-600 mb-2">
+                      <p className="text-sm text-red-700 font-medium mb-2">
                         Pembayaran Anda ditolak. Silakan upload ulang bukti
                         pembayaran yang valid.
                       </p>
-                      <div className="space-y-1 text-sm text-gray-600">
+                      <div className="space-y-1 text-sm text-gray-700">
                         <p>
                           <span className="font-semibold">Tanggal:</span>{" "}
                           {formatDate((enrollment.classes as any)?.class_date)}{" "}

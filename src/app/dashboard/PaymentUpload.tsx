@@ -61,29 +61,52 @@ export default function PaymentUpload({
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) throw new Error("User not authenticated");
+      if (!user) throw new Error("User tidak terautentikasi. Silakan login ulang.");
 
       // Upload file to storage
       const fileExt = selectedFile.name.split(".").pop();
       const fileName = `${user.id}/${enrollmentId}-${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      console.log("[PaymentUpload] Uploading to:", fileName);
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from("payment-proofs")
         .upload(fileName, selectedFile, {
           cacheControl: "3600",
           upsert: false,
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("[PaymentUpload] Upload error:", uploadError);
+        
+        // Handle specific RLS error
+        if (uploadError.message?.includes("row-level security") || 
+            uploadError.message?.includes("policy")) {
+          throw new Error(
+            "Sistem belum dikonfigurasi dengan benar. Silakan hubungi admin untuk mengaktifkan storage policy."
+          );
+        }
+        
+        throw new Error(uploadError.message || "Gagal mengunggah file");
+      }
+
+      console.log("[PaymentUpload] Upload success:", uploadData);
 
       // Get signed URL for private bucket (valid for 10 years)
       const { data: signedUrlData, error: urlError } = await supabase.storage
         .from("payment-proofs")
         .createSignedUrl(fileName, 60 * 60 * 24 * 365 * 10); // 10 years
 
-      if (urlError) throw urlError;
-      if (!signedUrlData?.signedUrl)
-        throw new Error("Failed to get signed URL");
+      if (urlError) {
+        console.error("[PaymentUpload] Signed URL error:", urlError);
+        throw new Error("Gagal membuat URL file");
+      }
+      
+      if (!signedUrlData?.signedUrl) {
+        throw new Error("Gagal mendapatkan URL file");
+      }
+
+      console.log("[PaymentUpload] Got signed URL");
 
       // Update enrollment with payment proof
       const { error: updateError } = await supabase
@@ -95,7 +118,21 @@ export default function PaymentUpload({
         })
         .eq("id", enrollmentId);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error("[PaymentUpload] Update enrollment error:", updateError);
+        
+        // Handle specific RLS error for enrollments table
+        if (updateError.message?.includes("row-level security") || 
+            updateError.message?.includes("policy")) {
+          throw new Error(
+            "Tidak dapat memperbarui data pembayaran. Silakan hubungi admin."
+          );
+        }
+        
+        throw new Error(updateError.message || "Gagal menyimpan data pembayaran");
+      }
+
+      console.log("[PaymentUpload] Enrollment updated successfully");
 
       setShowModal(false);
       setSelectedFile(null);
@@ -103,7 +140,7 @@ export default function PaymentUpload({
 
       alert("Bukti pembayaran berhasil diunggah! Menunggu verifikasi admin.");
     } catch (err: any) {
-      console.error("Upload error:", err);
+      console.error("[PaymentUpload] Error:", err);
       setError(err.message || "Terjadi kesalahan saat mengunggah");
     } finally {
       setUploading(false);
@@ -140,7 +177,7 @@ export default function PaymentUpload({
           <p className="text-sm font-semibold text-primary-900 mb-2">
             Informasi Pembayaran:
           </p>
-          <div className="text-sm text-primary-800 space-y-1">
+          <div className="text-sm text-primary-900 space-y-1">
             <p>
               <strong>Bank:</strong>{" "}
               {process.env.NEXT_PUBLIC_BANK_NAME || "BCA"}
@@ -157,7 +194,7 @@ export default function PaymentUpload({
               <strong>Jumlah:</strong> Rp 10.000
             </p>
           </div>
-          <p className="text-xs text-primary-700 mt-3 pt-2 border-t border-primary-200">
+          <p className="text-xs text-primary-900 mt-3 pt-2 border-t border-primary-300">
             <strong>Limitasi Upload:</strong>
             <br />
             • Format: JPEG, PNG, atau WebP
