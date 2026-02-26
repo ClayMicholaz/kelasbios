@@ -27,31 +27,53 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Get all open classes with enrollment count
+  // Get all open classes
   const { data: classes, error } = await supabase
     .from("classes")
-    .select(
-      `
-      *,
-      enrollments(payment_status)
-    `,
-    )
+    .select("*")
     .eq("status", "open")
     .order("class_date", { ascending: true });
 
-  // Calculate enrollment count for each class
-  const classesWithCount =
-    classes?.map((classItem) => {
-      const enrollmentCount =
-        classItem.enrollments?.filter(
-          (e: any) => e.payment_status === "verified",
-        ).length || 0;
+  // Calculate enrollment count for each class using direct count query
+  // This ensures consistency with admin and class detail pages
+  const classesWithCount = [];
+  if (classes) {
+    for (const classItem of classes) {
+      const { data: verifiedEnrollments, error: enrollmentError } =
+        await supabase
+          .from("enrollments")
+          .select("id")
+          .eq("class_id", classItem.id)
+          .eq("payment_status", "verified");
 
-      return {
+      const enrollmentCount = verifiedEnrollments?.length || 0;
+
+      // Debug logging with error checking
+      console.log(`[Homepage] Class: ${classItem.title}`);
+      console.log(`[Homepage] - Class ID: ${classItem.id}`);
+      console.log(
+        `[Homepage] - Max Participants: ${classItem.max_participants}`,
+      );
+
+      if (enrollmentError) {
+        console.error(
+          `[Homepage] - ERROR fetching enrollments:`,
+          enrollmentError,
+        );
+      }
+
+      console.log(`[Homepage] - Query returned:`, verifiedEnrollments);
+      console.log(`[Homepage] - Verified Count: ${enrollmentCount}`);
+      console.log(
+        `[Homepage] - Available: ${classItem.max_participants - enrollmentCount}`,
+      );
+
+      classesWithCount.push({
         ...classItem,
         enrollment_count: enrollmentCount,
-      };
-    }) || [];
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

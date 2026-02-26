@@ -17,10 +17,17 @@ export default function ClassCard({
   showEnrollButton = true,
 }: ClassCardProps) {
   const daysRemaining = getDaysRemaining(classData.registration_deadline);
-  const availableSeats =
-    classData.max_participants - (classData.enrollment_count || 0);
+  const enrollmentCount = classData.enrollment_count || 0;
+  const availableSeats = classData.max_participants - enrollmentCount;
   const isDeadlinePassed = daysRemaining < 0;
   const isFull = availableSeats <= 0;
+
+  // Debug logging
+  console.log(`[ClassCard] ${classData.title}:`, {
+    max_participants: classData.max_participants,
+    enrollment_count: enrollmentCount,
+    availableSeats: availableSeats,
+  });
 
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-200 border border-gray-200">
