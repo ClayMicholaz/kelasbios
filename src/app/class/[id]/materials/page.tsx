@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import PracticeQuiz from "./PracticeQuiz";
+import SecureDownloadButton from "./SecureDownloadButton";
 
 export const dynamic = "force-dynamic";
 
@@ -190,15 +191,10 @@ export default async function ClassMaterialsPage({
                     )}
                   </div>
                   {material.url && (
-                    <a
-                      href={material.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
-                    >
-                      Download
-                    </a>
+                    <SecureDownloadButton
+                      url={material.url}
+                      fileName={material.name}
+                    />
                   )}
                 </div>
               ))}

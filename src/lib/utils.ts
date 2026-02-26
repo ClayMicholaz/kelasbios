@@ -14,20 +14,30 @@ export function formatCurrency(amount: number): string {
 }
 
 export function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("id-ID", {
+  // Convert to WIB (UTC+7)
+  const utcDate = new Date(date);
+  const wibDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000));
+  
+  return wibDate.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: "Asia/Jakarta", // WIB timezone
   });
 }
 
 export function formatDateTime(date: string): string {
-  return new Date(date).toLocaleString("id-ID", {
+  // Convert to WIB (UTC+7)
+  const utcDate = new Date(date);
+  const wibDate = new Date(utcDate.getTime() + (7 * 60 * 60 * 1000));
+  
+  return wibDate.toLocaleString("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Jakarta", // WIB timezone
   });
 }
 

@@ -142,8 +142,15 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  const pendingPayments =
-    enrollments?.filter((e) => e.payment_status === "pending") || [];
+  // Separate enrollments by status
+  const awaitingPayment =
+    enrollments?.filter(
+      (e) => e.payment_status === "pending" && !e.payment_proof,
+    ) || [];
+  const pendingVerification =
+    enrollments?.filter(
+      (e) => e.payment_status === "pending" && e.payment_proof,
+    ) || [];
   const verifiedClasses =
     enrollments?.filter((e) => e.payment_status === "verified") || [];
   const rejectedPayments =
@@ -198,7 +205,7 @@ export default async function DashboardPage() {
                   Menunggu Verifikasi
                 </p>
                 <p className="text-3xl font-bold text-orange-600">
-                  {pendingPayments.length}
+                  {pendingVerification.length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
@@ -246,14 +253,14 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Pending Payments */}
-        {pendingPayments.length > 0 && (
+        {/* Awaiting Payment - Belum Upload Bukti */}
+        {awaitingPayment.length > 0 && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Menunggu Pembayaran
             </h2>
             <div className="space-y-4">
-              {pendingPayments.map((enrollment) => (
+              {awaitingPayment.map((enrollment) => (
                 <div
                   key={enrollment.id}
                   className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6"
@@ -294,6 +301,82 @@ export default async function DashboardPage() {
           </div>
         )}
 
+        {/* Pending Verification - Sudah Upload, Menunggu Verifikasi Admin */}
+        {pendingVerification.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Menunggu Verifikasi Admin
+            </h2>
+            <div className="space-y-4">
+              {pendingVerification.map((enrollment) => (
+                <div
+                  key={enrollment.id}
+                  className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div className="flex-1 mb-4 md:mb-0">
+                      <div className="flex items-start gap-2 mb-3">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          Sedang Diverifikasi
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-2">
+                        {(enrollment.classes as any)?.title}
+                      </h3>
+                      <p className="text-sm text-blue-900 font-medium mb-2">
+                        Bukti pembayaran Anda sedang diverifikasi oleh admin. Mohon tunggu.
+                      </p>
+                      <div className="space-y-1 text-sm text-gray-700">
+                        <p>
+                          <span className="font-semibold">Tanggal:</span>{" "}
+                          {formatDate((enrollment.classes as any)?.class_date)}{" "}
+                          •{" "}
+                          {formatTime((enrollment.classes as any)?.class_time)}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Ruangan:</span>{" "}
+                          {(enrollment.classes as any)?.classroom}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Upload:</span>{" "}
+                          {enrollment.payment_date
+                            ? formatDate(enrollment.payment_date)
+                            : "-"}
+                        </p>
+                        <p className="text-lg font-bold text-primary-600 mt-2">
+                          {formatCurrency(10000)}
+                        </p>
+                      </div>
+                    </div>
+                    {enrollment.payment_proof && (
+                      <div className="md:ml-6 flex items-center">
+                        <div className="text-center">
+                          <svg
+                            className="w-16 h-16 text-blue-500 mx-auto mb-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <p className="text-xs text-blue-900 font-medium">
+                            Bukti Telah Diupload
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Rejected Payments */}
         {rejectedPayments.length > 0 && (
           <div className="mb-8">
@@ -316,7 +399,7 @@ export default async function DashboardPage() {
                       <h3 className="text-lg font-bold text-gray-900 mb-2">
                         {(enrollment.classes as any)?.title}
                       </h3>
-                      <p className="text-sm text-red-700 font-medium mb-2">
+                      <p className="text-sm text-red-900 font-medium mb-2">
                         Pembayaran Anda ditolak. Silakan upload ulang bukti
                         pembayaran yang valid.
                       </p>
