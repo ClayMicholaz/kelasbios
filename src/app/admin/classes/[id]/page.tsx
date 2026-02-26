@@ -123,11 +123,15 @@ export default async function AdminClassDetailPage({
             </div>
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Ruangan</p>
-              <p className="font-semibold text-gray-900">{classData.classroom}</p>
+              <p className="font-semibold text-gray-900">
+                {classData.classroom}
+              </p>
             </div>
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Durasi</p>
-              <p className="font-semibold text-gray-900">{classData.duration_hours} jam</p>
+              <p className="font-semibold text-gray-900">
+                {classData.duration_hours} jam
+              </p>
             </div>
             <div className="text-sm">
               <p className="text-gray-600 mb-1">Kapasitas</p>

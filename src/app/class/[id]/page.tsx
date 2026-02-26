@@ -5,6 +5,7 @@ import {
   formatTime,
   formatCurrency,
   getDaysRemaining,
+  getCountdownText,
   isUUID,
 } from "@/lib/utils";
 import Link from "next/link";
@@ -371,9 +372,7 @@ export default async function ClassDetailPage({
                     </p>
                     {!isDeadlinePassed && (
                       <p className="text-sm text-orange-600 mt-1">
-                        {daysRemaining > 0
-                          ? `${daysRemaining} hari lagi`
-                          : "Hari ini!"}
+                        {getCountdownText(classData.registration_deadline)}
                       </p>
                     )}
                   </div>

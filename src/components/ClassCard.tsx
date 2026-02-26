@@ -4,6 +4,7 @@ import {
   formatTime,
   formatCurrency,
   getDaysRemaining,
+  getCountdownText,
 } from "@/lib/utils";
 import Link from "next/link";
 
@@ -145,9 +146,7 @@ export default function ClassCard({
             </p>
             {!isDeadlinePassed && (
               <p className="text-xs text-gray-500">
-                {daysRemaining > 0
-                  ? `Tutup dalam ${daysRemaining} hari`
-                  : "Tutup hari ini"}
+                {getCountdownText(classData.registration_deadline)}
               </p>
             )}
           </div>

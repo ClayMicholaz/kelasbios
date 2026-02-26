@@ -92,3 +92,21 @@ export function isUUID(str: string): boolean {
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(str);
 }
+
+export function getCountdownText(deadline: string): string {
+  const timeRemaining = getTimeRemaining(deadline);
+  
+  if (timeRemaining.days === 0 && timeRemaining.hours === 0 && timeRemaining.minutes === 0 && timeRemaining.seconds === 0) {
+    return "Sudah ditutup";
+  }
+  
+  if (timeRemaining.days > 0) {
+    return `Tutup dalam ${timeRemaining.days} hari`;
+  }
+  
+  if (timeRemaining.hours > 0) {
+    return `Tutup dalam ${timeRemaining.hours} jam`;
+  }
+  
+  return "Tutup hari ini";
+}
