@@ -9,6 +9,7 @@ interface EnrollButtonProps {
   userId: string;
   maxParticipants: number;
   currentEnrollments: number;
+  registrationDeadline: string;
 }
 
 export default function EnrollButton({
@@ -16,6 +17,7 @@ export default function EnrollButton({
   userId,
   maxParticipants,
   currentEnrollments,
+  registrationDeadline,
 }: EnrollButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -44,6 +46,39 @@ export default function EnrollButton({
       if (authError || !user) {
         throw new Error(
           "Sesi Anda telah berakhir. Silakan login kembali untuk melanjutkan.",
+        );
+      }
+
+      // Check if registration deadline has passed
+      const deadlineDate = new Date(registrationDeadline);
+      const now = new Date();
+      if (now > deadlineDate) {
+        throw new Error(
+          "Maaf, batas waktu pendaftaran sudah berakhir. Anda tidak dapat mendaftar lagi.",
+        );
+      }
+
+      // Fetch class data to double-check deadline from database
+      const { data: classData, error: classError } = await supabase
+        .from("classes")
+        .select("registration_deadline, status")
+        .eq("id", classId)
+        .single();
+
+      if (classError) throw classError;
+
+      // Server-side deadline validation
+      const dbDeadline = new Date(classData.registration_deadline);
+      if (now > dbDeadline) {
+        throw new Error(
+          "Maaf, batas waktu pendaftaran sudah berakhir. Anda tidak dapat mendaftar lagi.",
+        );
+      }
+
+      // Check if class is still open
+      if (classData.status !== "open") {
+        throw new Error(
+          "Maaf, kelas ini sudah ditutup. Anda tidak dapat mendaftar lagi.",
         );
       }
 

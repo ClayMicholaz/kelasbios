@@ -9,6 +9,7 @@ function getRotatingWhatsApp() {
     "+62 878-7269-7201",
     "+62 818-0660-3511",
     "+62 821-1349-4018",
+    "+62 858-9032-6818",
   ];
 
   const now = new Date();
@@ -54,7 +55,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           <div>
-            <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white">BIOS LMS</h3>
+            <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-white">
+              BIOS LMS
+            </h3>
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
               Platform pembelajaran eksklusif untuk mahasiswa Teknik Informatika
               UBM
@@ -94,7 +97,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white">Kontak</h4>
+            <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white">
+              Kontak
+            </h4>
             <ul className="space-y-2 text-sm sm:text-base text-gray-400">
               <li className="flex items-center">
                 <svg
@@ -181,9 +186,13 @@ export default function Footer() {
 
         <div className="border-t border-primary-800/50 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-xs sm:text-sm text-gray-400">
           <p className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-0">
-            <span>&copy; {new Date().getFullYear()} BIOS - UBM. All rights reserved.</span>
+            <span>
+              &copy; {new Date().getFullYear()} BIOS - UBM. All rights reserved.
+            </span>
             <span className="hidden sm:inline mx-2 text-accent-bright">|</span>
-            <span className="text-accent-bright sm:text-gray-400">Made with ❤️ for UBM Students</span>
+            <span className="text-accent-bright sm:text-gray-400">
+              Made with ❤️ for UBM Students
+            </span>
           </p>
         </div>
       </div>

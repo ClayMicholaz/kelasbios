@@ -109,6 +109,29 @@ export default async function ClassDetailPage({
   const enrollmentCount = enrollments?.length || 0;
   const availableSeats = classData.max_participants - enrollmentCount;
 
+  // Check user profile and role
+  let userProfile = null;
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    userProfile = profile;
+    isAdmin = profile?.role === "admin";
+
+    console.log(
+      "[Class Detail] User ID:",
+      user.id,
+      "Role:",
+      profile?.role,
+      "isAdmin:",
+      isAdmin,
+    );
+  }
+
   // Check if user is already enrolled
   let userEnrollment = null;
   if (user) {
@@ -120,7 +143,24 @@ export default async function ClassDetailPage({
       .single();
 
     userEnrollment = data;
+    console.log(
+      "[Class Detail] Enrollment:",
+      userEnrollment ? "Yes" : "No",
+      "Payment:",
+      userEnrollment?.payment_status,
+    );
   }
+
+  console.log(
+    "[Class Detail] Materials available:",
+    classData.materials ? "Yes" : "No",
+    "Count:",
+    Array.isArray(classData.materials) ? classData.materials.length : 0,
+  );
+  console.log(
+    "[Class Detail] Show MaterialsViewer?",
+    isAdmin || (userEnrollment && userEnrollment.payment_status === "verified"),
+  );
 
   const daysRemaining = getDaysRemaining(classData.registration_deadline);
   const isDeadlinePassed = daysRemaining < 0;
@@ -452,6 +492,7 @@ export default async function ClassDetailPage({
                       userId={user.id}
                       maxParticipants={classData.max_participants}
                       currentEnrollments={enrollmentCount}
+                      registrationDeadline={classData.registration_deadline}
                     />
                   ) : (
                     !isDeadlinePassed && (
@@ -503,11 +544,46 @@ export default async function ClassDetailPage({
                   </div>
                 )}
 
-              {/* Materials Viewer - Only for enrolled & verified students after class starts */}
-              {userEnrollment &&
-                userEnrollment.payment_status === "verified" && (
-                  <div className="mb-8">
-                    <MaterialsViewer classId={classData.id} />
+              {/* Materials Viewer - For enrolled & verified students OR admin */}
+              {/* Show for logged in users who are admin OR enrolled */}
+              {user && (isAdmin || userEnrollment) && (
+                <div className="mb-8">
+                  <MaterialsViewer classId={classData.id} />
+                </div>
+              )}
+
+              {/* Show message if materials exist but user not eligible */}
+              {user &&
+                !isAdmin &&
+                !userEnrollment &&
+                classData.materials &&
+                Array.isArray(classData.materials) &&
+                classData.materials.length > 0 && (
+                  <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                    <div className="flex items-start">
+                      <svg
+                        className="w-6 h-6 text-yellow-600 mt-0.5 mr-3 shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                      <div>
+                        <h3 className="text-lg font-semibold text-yellow-900 mb-1">
+                          Materi Tersedia
+                        </h3>
+                        <p className="text-yellow-800">
+                          Kelas ini memiliki materi pembelajaran. Daftar
+                          terlebih dahulu untuk mengakses materi.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
             </div>
