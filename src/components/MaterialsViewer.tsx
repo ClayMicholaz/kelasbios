@@ -115,7 +115,7 @@ export default function MaterialsViewer({ classId }: MaterialsViewerProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-700 to-primary-900 text-white px-6 py-4">
+      <div className="bg-linear-to-r from-primary-700 to-primary-900 text-white px-6 py-4">
         <h2 className="text-2xl font-bold flex items-center">
           <svg
             className="w-6 h-6 mr-2"
@@ -142,12 +142,41 @@ export default function MaterialsViewer({ classId }: MaterialsViewerProps) {
               <button
                 key={index}
                 onClick={() => setSelectedMaterial(index)}
-                className={`px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
+                className={`px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors flex items-center gap-2 ${
                   selectedMaterial === index
                     ? "border-b-2 border-primary-600 text-primary-600 bg-white"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
+                {material.type === "markdown" ? (
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                )}
                 {material.name}
               </button>
             ))}
@@ -162,6 +191,7 @@ export default function MaterialsViewer({ classId }: MaterialsViewerProps) {
             {currentMaterial.error}
           </div>
         ) : currentMaterial.type === "markdown" && currentMaterial.content ? (
+          // Markdown viewer
           <article className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-primary-600 prose-code:text-primary-800 prose-pre:bg-gray-900 prose-pre:text-gray-100">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -170,7 +200,50 @@ export default function MaterialsViewer({ classId }: MaterialsViewerProps) {
               {currentMaterial.content}
             </ReactMarkdown>
           </article>
+        ) : currentMaterial.type === "file" && currentMaterial.url ? (
+          // File download (PDF, etc)
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
+              <svg
+                className="w-10 h-10 text-red-600"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" />
+                <path d="M14 2v6h6M9 13h6M9 17h6M9 9h1" fill="white" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {currentMaterial.name}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {currentMaterial.name.endsWith(".pdf")
+                ? "File PDF - Klik tombol di bawah untuk mengunduh"
+                : "File - Klik tombol di bawah untuk mengunduh"}
+            </p>
+            <a
+              href={currentMaterial.url}
+              download
+              className="inline-flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg"
+            >
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                />
+              </svg>
+              Download File
+            </a>
+          </div>
         ) : currentMaterial.url ? (
+          // Fallback for other types
           <div className="text-center py-8">
             <svg
               className="w-16 h-16 text-gray-400 mx-auto mb-4"
@@ -186,7 +259,7 @@ export default function MaterialsViewer({ classId }: MaterialsViewerProps) {
               />
             </svg>
             <p className="text-gray-600 mb-4">
-              This material is a file download
+              Material tersedia untuk diunduh
             </p>
             <a
               href={currentMaterial.url}

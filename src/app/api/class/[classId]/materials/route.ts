@@ -97,35 +97,49 @@ export async function GET(
         .filter((m) => m.url)
         .map(async (material) => {
           try {
-            // Extract path from URL
-            const urlPath = material.url!.split(
-              "/storage/v1/object/public/",
-            )[1];
+            const isMarkdown = material.url!.endsWith(".md");
 
-            // Download file from storage
-            const { data: fileData, error: downloadError } =
-              await supabase.storage
-                .from("class-materials")
-                .download(urlPath.replace("class-materials/", ""));
+            // For markdown files, download and read content for viewer
+            if (isMarkdown) {
+              // Extract path from URL
+              const urlPath = material.url!.split(
+                "/storage/v1/object/public/",
+              )[1];
 
-            if (downloadError) {
-              console.error("[API Materials] Download error:", downloadError);
+              // Download file from storage
+              const { data: fileData, error: downloadError } =
+                await supabase.storage
+                  .from("class-materials")
+                  .download(urlPath.replace("class-materials/", ""));
+
+              if (downloadError) {
+                console.error("[API Materials] Download error:", downloadError);
+                return {
+                  name: material.name,
+                  url: material.url,
+                  content: null,
+                  type: "markdown",
+                  error: "Failed to load material",
+                };
+              }
+
+              // Read file content as text
+              const content = await fileData.text();
+
               return {
                 name: material.name,
                 url: material.url,
-                content: null,
-                error: "Failed to load material",
+                content,
+                type: "markdown",
               };
             }
 
-            // Read file content as text (assuming markdown)
-            const content = await fileData.text();
-
+            // For non-markdown files (PDF, etc), just return URL for download
             return {
               name: material.name,
               url: material.url,
-              content,
-              type: material.url!.endsWith(".md") ? "markdown" : "file",
+              content: null,
+              type: "file", // PDF or other file type
             };
           } catch (error) {
             console.error("[API Materials] Error processing material:", error);

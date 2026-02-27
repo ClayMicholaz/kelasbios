@@ -377,15 +377,22 @@ export default async function ClassDetailPage({
                         className="text-sm text-orange-600 mt-1 block"
                       />
                     )}
+                    {isDeadlinePassed && (
+                      <p className="text-sm text-red-600 font-semibold mt-1">
+                        Pendaftaran sudah ditutup
+                      </p>
+                    )}
                   </div>
 
                   {!user ? (
-                    <Link
-                      href="/auth/login"
-                      className="block w-full text-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
-                    >
-                      Login untuk Mendaftar
-                    </Link>
+                    !isDeadlinePassed && (
+                      <Link
+                        href="/auth/login"
+                        className="block w-full text-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold"
+                      >
+                        Login untuk Mendaftar
+                      </Link>
+                    )
                   ) : userEnrollment ? (
                     <div className="space-y-3">
                       <div
@@ -447,16 +454,14 @@ export default async function ClassDetailPage({
                       currentEnrollments={enrollmentCount}
                     />
                   ) : (
-                    <button
-                      disabled
-                      className="w-full px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-semibold"
-                    >
-                      {isDeadlinePassed
-                        ? "Pendaftaran Ditutup"
-                        : isFull
-                          ? "Kelas Penuh"
-                          : "Tidak Tersedia"}
-                    </button>
+                    !isDeadlinePassed && (
+                      <button
+                        disabled
+                        className="w-full px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-semibold"
+                      >
+                        {isFull ? "Kelas Penuh" : "Tidak Tersedia"}
+                      </button>
+                    )
                   )}
                 </div>
               </div>

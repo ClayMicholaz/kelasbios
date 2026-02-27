@@ -150,20 +150,27 @@ export default function ClassCard({
                 className="text-xs text-gray-500"
               />
             )}
+            {isDeadlinePassed && (
+              <p className="text-xs text-red-600 font-semibold mt-1">
+                Pendaftaran ditutup
+              </p>
+            )}
           </div>
 
-          {showEnrollButton && classData.status === "open" && (
-            <Link
-              href={`/class/${classData.slug || classData.id}`}
-              className={`w-full sm:w-auto text-center px-4 sm:px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
-                isDeadlinePassed || isFull
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-primary-800 text-white hover:bg-primary-700"
-              }`}
-            >
-              {isDeadlinePassed ? "Ditutup" : isFull ? "Penuh" : "Daftar"}
-            </Link>
-          )}
+          {showEnrollButton &&
+            classData.status === "open" &&
+            !isDeadlinePassed && (
+              <Link
+                href={`/class/${classData.slug || classData.id}`}
+                className={`w-full sm:w-auto text-center px-4 sm:px-6 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+                  isFull
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-primary-800 text-white hover:bg-primary-700"
+                }`}
+              >
+                {isFull ? "Penuh" : "Daftar"}
+              </Link>
+            )}
         </div>
       </div>
     </div>
